@@ -2,6 +2,7 @@
 
 # EEPROM REGISTER ADDRESSES for XH430
 # Permanently stored in memory once changed
+ADDR_PRO_OPERATING_MODE     = 11
 
 # RAM REGISTER ADDRESSES
 # resets after shut down

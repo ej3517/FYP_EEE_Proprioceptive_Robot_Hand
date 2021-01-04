@@ -23,8 +23,8 @@ class XH430:
     # Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
     packetHandler = PacketHandler(PROTOCOL_VERSION)
 
-    DXL_MINIMUM_POSITION_VALUE = 10  # Dynamixel will rotate between this value
-    DXL_MAXIMUM_POSITION_VALUE = 4000  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+    DXL_MINIMUM_POSITION_VALUE = 1535  # Dynamixel will rotate between this value
+    DXL_MAXIMUM_POSITION_VALUE = 2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
     DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
 
     @classmethod
@@ -88,9 +88,19 @@ class XH430:
         print(self.get_register1(ADDR_PRO_TORQUE_ENABLE))
 
     def set_position(self, dxl_goal_position):
-        """write goal position"""
-        self.set_register4(ADDR_PRO_GOAL_POSITION, dxl_goal_position)
-        print("Position of dxl ID: %d set to %d " % (self.id, dxl_goal_position))
+        """write goal position and check if the goal position is not out of bound"""
+        if dxl_goal_position > XH430.DXL_MAXIMUM_POSITION_VALUE:
+            self.set_register4(ADDR_PRO_GOAL_POSITION, XH430.DXL_MAXIMUM_POSITION_VALUE)
+            print("Goal position out of bound so Position of dxl ID: %d set to %d " % (self.id, XH430.DXL_MAXIMUM_POSITION_VALUE))
+            return XH430.DXL_MAXIMUM_POSITION_VALUE
+        elif dxl_goal_position < XH430.DXL_MINIMUM_POSITION_VALUE:
+            self.set_register4(ADDR_PRO_GOAL_POSITION, XH430.DXL_MINIMUM_POSITION_VALUE)
+            print("Goal position out of bound so Position of dxl ID: %d set to %d " % (self.id, XH430.DXL_MINIMUM_POSITION_VALUE))
+            return XH430.DXL_MINIMUM_POSITION_VALUE
+        else:
+            self.set_register4(ADDR_PRO_GOAL_POSITION, dxl_goal_position)
+            print("Position of dxl ID: %d set to %d " % (self.id, dxl_goal_position))
+            return dxl_goal_position
 
     def get_position(self):
         """Read present position"""
