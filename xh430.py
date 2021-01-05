@@ -27,6 +27,11 @@ class XH430:
     DXL_MAXIMUM_POSITION_VALUE = 2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
     DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
 
+    # Different operating mode
+    CURRENT_CONTROL_MODE = 0
+    POSITION_CONTROL_MODE = 3
+    CURRENT_BASED_POSITION_CONTROL_MODE = 5
+
     @classmethod
     def open_port(cls):
         # Open port
@@ -62,6 +67,11 @@ class XH430:
         dxl_comm_result, dxl_error = XH430.packetHandler.write1ByteTxRx(XH430.portHandler, self.id, reg_num, reg_value)
         XH430.check_error(dxl_comm_result, dxl_error)
 
+    def set_register2(self, reg_num, reg_value):
+        # Enable Dynamixel Torque
+        dxl_comm_result, dxl_error = XH430.packetHandler.write2ByteTxRx(XH430.portHandler, self.id, reg_num, reg_value)
+        XH430.check_error(dxl_comm_result, dxl_error)
+
     def set_register4(self, reg_num, reg_value):
         # Enable Dynamixel Torque
         dxl_comm_result, dxl_error = XH430.packetHandler.write4ByteTxRx(XH430.portHandler, self.id, reg_num, reg_value)
@@ -69,6 +79,11 @@ class XH430:
 
     def get_register1(self, reg_num):
         reg_data, dxl_comm_result, dxl_error = XH430.packetHandler.read1ByteTxRx(XH430.portHandler, self.id, reg_num)
+        XH430.check_error(dxl_comm_result, dxl_error)
+        return reg_data
+
+    def get_register2(self, reg_num):
+        reg_data, dxl_comm_result, dxl_error = XH430.packetHandler.read2ByteTxRx(XH430.portHandler, self.id, reg_num)
         XH430.check_error(dxl_comm_result, dxl_error)
         return reg_data
 
@@ -86,6 +101,20 @@ class XH430:
         """disable torque for motor"""
         self.set_register1(ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE)
         print(self.get_register1(ADDR_PRO_TORQUE_ENABLE))
+
+    def set_operating_mode(self, operating_mode):
+        self.set_register1(ADDR_PRO_OPER_MODE, operating_mode)
+        print("[ID:%03d] Operating Mode set to %03d" % (self.id, operating_mode))
+
+    def get_operating_mode(self):
+        dxl_operating_mode = self.get_register1(ADDR_PRO_OPER_MODE)
+        print("[ID:%03d] Operating Mode: %03d" % (self.id, dxl_operating_mode))
+
+    def set_position_limit(self):
+        self.set_register4(ADDR_PRO_MAX_POS_LIMIT, XH430.DXL_MAXIMUM_POSITION_VALUE)
+        self.set_register4(ADDR_PRO_MIN_POS_LIMIT, XH430.DXL_MINIMUM_POSITION_VALUE)
+        print("[ID:%03d] MaxPos:%03d" % (self.id, self.get_register4(ADDR_PRO_MAX_POS_LIMIT)))
+        print("[ID:%03d] MaxPos:%03d" % (self.id, self.get_register4(ADDR_PRO_MIN_POS_LIMIT)))
 
     def set_position(self, dxl_goal_position):
         """write goal position and check if the goal position is not out of bound"""
@@ -107,6 +136,19 @@ class XH430:
         dxl_present_position = self.get_register4(ADDR_PRO_PRESENT_POSITION)
         print("[ID:%03d] PresPos:%03d" % (self.id, dxl_present_position))
         return dxl_present_position
+
+    def get_current(self):
+        """Read present current"""
+        dxl_present_current = self.get_register2(ADDR_PRO_PRESENT_CURRENT)
+        dxl_current_limit = self.get_register2(ADDR_PRO_CURRENT_LIMIT)
+        print("[ID:%03d] PresCurrent:%03d" % (self.id, dxl_present_current))
+        print("[ID:%03d] CurrentLim:%03d" % (self.id, dxl_current_limit))
+        return dxl_present_current
+
+    def set_current(self, dxl_goal_current):
+        """write goal current and check if the goal current is not out of bound"""
+        self.set_register2(ADDR_PRO_GOAL_CURRENT, dxl_goal_current)
+        print("Current of dxl ID: %d set to %d " % (self.id, dxl_goal_current))
 
     @staticmethod
     def check_error(comm_result, dxl_err):

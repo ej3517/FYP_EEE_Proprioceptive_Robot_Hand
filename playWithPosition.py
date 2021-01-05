@@ -10,9 +10,15 @@ my_dxl_R = XH430(2)
 XH430.open_port()
 XH430.set_baudrate()
 
+# setting the position limit
+my_dxl_L.set_position_limit()
+my_dxl_R.set_position_limit()
 # activating torque
 my_dxl_L.enable_torque()
 my_dxl_R.enable_torque()
+# check operating mode
+my_dxl_L.get_operating_mode()
+my_dxl_R.get_operating_mode()
 
 
 def user_input():
@@ -76,7 +82,27 @@ def test_pos(motor_object_L, motor_object_R):
         plt.show() """
 
 
+def test_torque(motor_object):
+    motor_object.disable_torque()
+    motor_object.set_operating_mode(motor_object.CURRENT_CONTROL_MODE)
+    motor_object.get_operating_mode()
+    motor_object.enable_torque()
+    bool_test = True
+    while bool_test:
+        # left actuator
+        motor_object.get_current()
+        # desired angle input
+        input_current = int(input("input current : "))
+        # read present current
+        motor_object.set_current(input_current)
+        # do we continue
+        bool_test = user_input()
+    motor_object.disable_torque()
+    motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
+
+
 test_pos(my_dxl_L, my_dxl_R)
+test_torque(my_dxl_L)
 
 # deconnecting
 my_dxl_L.disable_torque()
