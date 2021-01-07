@@ -123,7 +123,3 @@ test_torque(my_dxl_L)
 my_dxl_L.disable_torque()
 my_dxl_R.disable_torque()
 XH430.close_port()
-<<<<<<< HEAD
-
-=======
->>>>>>> ea339ce61e55a4a8310cd433b61be17dbe2a6f38
