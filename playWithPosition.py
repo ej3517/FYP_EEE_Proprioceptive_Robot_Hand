@@ -83,29 +83,44 @@ def test_pos(motor_object_L, motor_object_R):
 
 
 def test_torque(motor_object):
-    motor_object.disable_torque()
-    motor_object.set_operating_mode(motor_object.CURRENT_CONTROL_MODE)
-    motor_object.get_operating_mode()
+    # initialize the position
+    motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
     motor_object.enable_torque()
-    bool_test = True
-    while bool_test:
-        # left actuator
+    # desired angle input
+    input_angle = float(input("input_angle : "))
+    input_pos = deg2pos(input_angle)
+    input_pos = motor_object.set_position(input_pos)
+    while 1:
+        present_pos = motor_object.get_position()
+        if not (abs(input_pos - present_pos) > motor_object.DXL_MOVING_STATUS_THRESHOLD):
+            break
+    # set to current control mode
+    motor_object.set_operating_mode(motor_object.CURRENT_CONTROL_MODE)
+    motor_object.enable_torque()
+    # counter
+    u = 0
+    # desired angle input
+    input_current = int(input("input current : "))
+    # read present current
+    motor_object.set_current(input_current)
+    while u < 30:
         motor_object.get_current()
-        # desired angle input
-        input_current = int(input("input current : "))
-        # read present current
-        motor_object.set_current(input_current)
-        # do we continue
-        bool_test = user_input()
+        print("this is the input current", input_current)
+        present_position = motor_object.get_position()
+        if present_position > 3071 or present_position < 1024:
+            motor_object.disable_torque()
+            print(u)
+            break
+        else:
+            u += 1
     motor_object.disable_torque()
     motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
 
-
-test_pos(my_dxl_L, my_dxl_R)
+#test_pos(my_dxl_L, my_dxl_R)
 test_torque(my_dxl_L)
 
 # deconnecting
 my_dxl_L.disable_torque()
 my_dxl_R.disable_torque()
 XH430.close_port()
-##
+

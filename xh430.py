@@ -23,8 +23,8 @@ class XH430:
     # Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
     packetHandler = PacketHandler(PROTOCOL_VERSION)
 
-    DXL_MINIMUM_POSITION_VALUE = 1535  # Dynamixel will rotate between this value
-    DXL_MAXIMUM_POSITION_VALUE = 2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+    DXL_MINIMUM_POSITION_VALUE = 1024 #1535  # Dynamixel will rotate between this value
+    DXL_MAXIMUM_POSITION_VALUE = 3071 #2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
     DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
 
     # Different operating mode
@@ -95,14 +95,15 @@ class XH430:
     def enable_torque(self):
         """enable torque for motor"""
         self.set_register1(ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE)
-        print(self.get_register1(ADDR_PRO_TORQUE_ENABLE))
+        print("the torque has been enabled : ", self.get_register1(ADDR_PRO_TORQUE_ENABLE))
 
     def disable_torque(self):
         """disable torque for motor"""
         self.set_register1(ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE)
-        print(self.get_register1(ADDR_PRO_TORQUE_ENABLE))
+        print("the torque has been disabled : ", self.get_register1(ADDR_PRO_TORQUE_ENABLE))
 
     def set_operating_mode(self, operating_mode):
+        self.disable_torque()
         self.set_register1(ADDR_PRO_OPER_MODE, operating_mode)
         print("[ID:%03d] Operating Mode set to %03d" % (self.id, operating_mode))
 
@@ -141,8 +142,11 @@ class XH430:
         """Read present current"""
         dxl_present_current = self.get_register2(ADDR_PRO_PRESENT_CURRENT)
         dxl_current_limit = self.get_register2(ADDR_PRO_CURRENT_LIMIT)
+        # We want the signed version of the present current
+        if dxl_present_current >= 0x8000:
+            dxl_present_current -= 0x10000
         print("[ID:%03d] PresCurrent:%03d" % (self.id, dxl_present_current))
-        print("[ID:%03d] CurrentLim:%03d" % (self.id, dxl_current_limit))
+        #print("[ID:%03d] CurrentLim:%03d" % (self.id, dxl_current_limit))
         return dxl_present_current
 
     def set_current(self, dxl_goal_current):
