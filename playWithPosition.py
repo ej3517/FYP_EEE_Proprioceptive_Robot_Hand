@@ -116,8 +116,8 @@ def test_torque(motor_object):
     motor_object.disable_torque()
     motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
 
-#test_pos(my_dxl_L, my_dxl_R)
-test_torque(my_dxl_L)
+test_pos(my_dxl_L, my_dxl_R)
+#test_torque(my_dxl_L)
 
 # deconnecting
 my_dxl_L.disable_torque()

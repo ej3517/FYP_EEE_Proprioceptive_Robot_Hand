@@ -49,23 +49,23 @@ if ~libisloaded(lib_name)
 end
 
 % Control table address
-ADDR_MX_TORQUE_ENABLE       = 24;           % Control table address is different in Dynamixel model
-ADDR_MX_GOAL_POSITION       = 30;
-ADDR_MX_PRESENT_POSITION    = 36;
+ADDR_MX_TORQUE_ENABLE       = 64;           % Control table address is different in Dynamixel model
+ADDR_MX_GOAL_POSITION       = 116;
+ADDR_MX_PRESENT_POSITION    = 132;
 
 % Protocol version
 PROTOCOL_VERSION            = 1.0;          % See which protocol version is used in the Dynamixel
 
 % Default setting
-DXL_ID                      = 1;            % Dynamixel ID: 1
+DXL_ID                      = 2;            % Dynamixel ID: 1
 BAUDRATE                    = 57600;
-DEVICENAME                  = 'COM1';       % Check which port is being used on your controller
+DEVICENAME                  = '/dev/cu.usbserial-FT4TFUMI';       % Check which port is being used on your controller
                                             % ex) Windows: 'COM1'   Linux: '/dev/ttyUSB0' Mac: '/dev/tty.usbserial-*'
 
 TORQUE_ENABLE               = 1;            % Value for enabling the torque
 TORQUE_DISABLE              = 0;            % Value for disabling the torque
-DXL_MINIMUM_POSITION_VALUE  = 100;          % Dynamixel will rotate between this value
-DXL_MAXIMUM_POSITION_VALUE  = 4000;         % and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+DXL_MINIMUM_POSITION_VALUE  = 1300;          % Dynamixel will rotate between this value
+DXL_MAXIMUM_POSITION_VALUE  = 2700;         % and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
 DXL_MOVING_STATUS_THRESHOLD = 10;           % Dynamixel moving status threshold
 
 ESC_CHARACTER               = 'e';          % Key for escaping loop

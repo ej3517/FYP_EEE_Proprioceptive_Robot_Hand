@@ -23,8 +23,8 @@ class XH430:
     # Get methods and members of Protocol1PacketHandler or Protocol2PacketHandler
     packetHandler = PacketHandler(PROTOCOL_VERSION)
 
-    DXL_MINIMUM_POSITION_VALUE = 1024 #1535  # Dynamixel will rotate between this value
-    DXL_MAXIMUM_POSITION_VALUE = 3071 #2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
+    DXL_MINIMUM_POSITION_VALUE = 1324 #1535  # Dynamixel will rotate between this value
+    DXL_MAXIMUM_POSITION_VALUE = 2771 #2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
     DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
 
     # Different operating mode
@@ -105,6 +105,7 @@ class XH430:
     def set_operating_mode(self, operating_mode):
         self.disable_torque()
         self.set_register1(ADDR_PRO_OPER_MODE, operating_mode)
+        self.enable_torque()
         print("[ID:%03d] Operating Mode set to %03d" % (self.id, operating_mode))
 
     def get_operating_mode(self):
