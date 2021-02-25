@@ -1,6 +1,7 @@
 from xh430 import *
 import time
 import matplotlib.pyplot as plt
+import numpy as np
 
 # create motor object
 my_dxl_L = XH430(1)
@@ -103,21 +104,23 @@ def single_act(motor_object):
             present_time = time.perf_counter() - start_time
             motor_pos_ref += [input_pos]
             motor_pos += [present_pos]
-            motor_vel += [[present_vel]]
+            motor_vel += [present_vel]
             exp_time += [present_time]
             if not abs(input_pos - present_pos) > motor_object.DXL_MOVING_STATUS_THRESHOLD:
                 break
+        # asking user for new input
+        bool_test = user_input()
+        print(motor_pos)
+        print(motor_vel)
         ### plotting ###
         plt.figure()
+        plt.subplot(2,1,1)
         plt.plot(exp_time, motor_pos)
         plt.title("Position trajectory")
-        plt.show()
-        plt.figure()
+        plt.subplot(2,1,2)
         plt.plot(exp_time, motor_vel)
         plt.title("Velocity trajectory")
         plt.show()
-        # asking user for new input
-        bool_test = user_input()
 
 
 def test_torque(motor_object):
