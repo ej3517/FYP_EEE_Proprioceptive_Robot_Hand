@@ -139,6 +139,12 @@ class XH430:
         print("[ID:%03d] PresPos:%03d" % (self.id, dxl_present_position))
         return dxl_present_position
 
+    def get_velocity(self):
+        """Read present velocity"""
+        dxl_present_velocity = self.get_register4(ADDR_PRO_PRESENT_VELOCITY)
+        print("[ID:%03d] PresVel:%03d" % (self.id, dxl_present_velocity))
+        return dxl_present_velocity
+
     def get_current(self):
         """Read present current"""
         dxl_present_current = self.get_register2(ADDR_PRO_PRESENT_CURRENT)

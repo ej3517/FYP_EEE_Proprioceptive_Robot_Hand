@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # create motor object
 my_dxl_L = XH430(1)
-my_dxl_R = XH430(2)
+my_dxl_R = XH430(2)  # Right actuator (base close to us)
 
 # connecting
 XH430.open_port()
@@ -55,7 +55,7 @@ def test_pos(motor_object_L, motor_object_R):
         input_pos_L = motor_object_L.set_position(input_pos)
         input_pos_R = motor_object_R.set_position(input_pos)
         # start of the motion
-        start_time = time.time()
+        start_time = time.perf_counter()
         # read present position
         while 1:
             # left actuator
@@ -80,6 +80,44 @@ def test_pos(motor_object_L, motor_object_R):
         plt.plot(exp_time, motor_pos, markersize=3)
         plt.title('Evolution of the Actuator position')
         plt.show() """
+
+def single_act(motor_object):
+    bool_test = True
+    while bool_test:
+        #FOR PLOTTING
+        motor_pos_ref = []
+        motor_pos = []
+        motor_vel = []
+        exp_time = []
+        motor_object.get_position()
+        # desired angle input
+        input_angle = float(input("input_angle : "))
+        input_pos = deg2pos(input_angle)
+        input_pos = motor_object.set_position(input_pos)
+        # start of the motion
+        start_time = time.perf_counter()
+        # read present position
+        while 1:
+            present_pos = motor_object.get_position()
+            present_vel = motor_object.get_velocity()
+            present_time = time.perf_counter() - start_time
+            motor_pos_ref += [input_pos]
+            motor_pos += [present_pos]
+            motor_vel += [[present_vel]]
+            exp_time += [present_time]
+            if not abs(input_pos - present_pos) > motor_object.DXL_MOVING_STATUS_THRESHOLD:
+                break
+        ### plotting ###
+        plt.figure()
+        plt.plot(exp_time, motor_pos)
+        plt.title("Position trajectory")
+        plt.show()
+        plt.figure()
+        plt.plot(exp_time, motor_vel)
+        plt.title("Velocity trajectory")
+        plt.show()
+        # asking user for new input
+        bool_test = user_input()
 
 
 def test_torque(motor_object):
@@ -116,8 +154,8 @@ def test_torque(motor_object):
     motor_object.disable_torque()
     motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
 
-test_pos(my_dxl_L, my_dxl_R)
-#test_torque(my_dxl_L)
+
+single_act(my_dxl_R)
 
 # deconnecting
 my_dxl_L.disable_torque()
