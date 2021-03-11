@@ -41,10 +41,10 @@ def motionGradient(traj, dt):
     return len(traj)/dt
 
 
-def iniPosition(motor_object, traj):
-    motor_object.set_position(traj[0])
+def iniPosition(motor_L, motor_R, traj):
+    motor_L.set_position(traj[0])
+    motor_R.set_position(traj[-1])
     time.sleep(2)
-
 
 def singleAct(motor_object, traj, dt, forward):
     """change position of one actuator with a given speed"""
@@ -71,50 +71,61 @@ def singleAct(motor_object, traj, dt, forward):
     final_pos = motor_object.get_position()
     return final_pos
 
-
-def parallelDualAct(motor_L, motor_R, traj, dt, forward):
+def graspManip(motor_L, motor_R, traj, dt, forward):
     """parallel motion of the actuator with a given speed"""
     if forward:
-        forward_coeff = 1
-        last_index = -1
+        forward_coeff_L = 1
+        forward_coeff_R = -1
+        last_index_L = -1
+        last_index_R = 0
     else:
-        forward_coeff = -1
-        last_index = 0
-    start_pos_L = motor_L.get_position()
-    start_pos_R = motor_R.get_position()
+        forward_coeff_L = -1
+        forward_coeff_R = 1
+        last_index_L = 0
+        last_index_R = -1
+    start_pos_L = motor_L.get_position() # start position
+    start_pos_R = motor_R.get_position() # start position
     gradient = int(motionGradient(traj, dt))  # gradient of the motion
     step = 1
     while abs(step) <= dt:
-        input_pos_L = gradient*step*forward_coeff + start_pos_L
-        input_pos_R = gradient*step*forward_coeff + start_pos_R
+        new_present_pos_L = motor_L.get_position()
+        new_present_pos_R = motor_R.get_position()
+        input_pos_L = gradient*step*forward_coeff_L + start_pos_L
+        input_pos_R = gradient*step*forward_coeff_R + start_pos_R
         input_pos_L = motor_L.set_position(input_pos_L)
         input_pos_R = motor_R.set_position(input_pos_R)
         while 1:
             present_pos_L = motor_L.get_position()
             present_pos_R = motor_R.get_position()
-
-            if ((not abs(input_pos_L - present_pos_L) > motor_L.DXL_MOVING_STATUS_THRESHOLD) and
-                (not abs(input_pos_R - present_pos_R) > motor_R.DXL_MOVING_STATUS_THRESHOLD)):
+            if present_pos_L == new_present_pos_L or present_pos_R == new_present_pos_R:
+                break
+            elif ((not abs(input_pos_L - present_pos_L) > motor_L.DXL_MOVING_STATUS_THRESHOLD) and
+                    (not abs(input_pos_R - present_pos_R) > motor_R.DXL_MOVING_STATUS_THRESHOLD)):
                 step += 1
                 break
-    motor_L.set_position(traj[last_index])
-    motor_R.set_position(traj[last_index])
-    time.sleep(.75) # time for the actuator to reach the final position
+            new_present_pos_L = motor_L.get_position()
+            new_present_pos_R = motor_R.get_position()
+        if present_pos_L == new_present_pos_L or present_pos_R == new_present_pos_R:
+            break
+    if (step > dt):
+        motor_L.set_position(traj[last_index_L])
+        motor_R.set_position(traj[last_index_R])
+        time.sleep(.75) # time for the actuator to reach the final position
+    else:
+        motor_L.set_position(new_present_pos_L)
+        motor_R.set_position(new_present_pos_R)
+        time.sleep(.75) # time for the actuator to reach the final position
     print("the final position is :")
     final_pos_L = motor_L.get_position()
     final_pos_R = motor_R.get_position()
-    return [final_pos_L, final_pos_R]
+    return [*range(final_pos_R, 2275, 1)]
 
 
-iniPosition(my_dxl_L, lin_traj)
-iniPosition(my_dxl_R, lin_traj)
+iniPosition(my_dxl_L, my_dxl_R, lin_traj)
 dt = int(input("How long do you want the motion to last :")) # after testing 30 ?
-#singleAct(my_dxl_L, lin_traj, dt, True)
-#singleAct(my_dxl_L, lin_traj, dt, False)
-parallelDualAct(my_dxl_L, my_dxl_R, lin_traj, dt, True)
-parallelDualAct(my_dxl_L, my_dxl_R, lin_traj, dt, False)
-
-print(my_dxl_L.get_position())
+new_traj = graspManip(my_dxl_L, my_dxl_R, lin_traj, dt, True)
+singleAct(my_dxl_R, new_traj, dt, True)
+print("it worked !!!!")
 
 # deconnecting
 my_dxl_L.disable_torque()
