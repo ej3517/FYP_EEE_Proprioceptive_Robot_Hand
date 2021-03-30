@@ -214,41 +214,40 @@ def controlRolling(motor_L, motor_R, traj):
     singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise)
     return [data_pos_L, data_pos_R]
 
+#### DATA COLLECTION
+[data_pos_L, data_pos_R] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
 
-#[data_pos_L, data_pos_R] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
-
-# instantiate an empty dict
-"""
-filename = "trial obj(square) pos(up) dim(3x3)"
+#### STORE THE DATA INTO A JSON FILE
+filename = "trial obj(square) pos(up) dim(2x2)"
 data_pos = {
     filename: {
         "LF": data_pos_L,
         "RF": data_pos_R
     }
 }
-"""
 
-test = {
-    "test": {
-        "LF": 0,
-        "RF": 1
-    }
-}
+
+### initialize the json file
+#with open("data_pos.json", 'w') as f:
+    # indent=2 is not needed but makes the file human-readable
+    #json.dump(data_pos, f, indent=2)
+
 
 with open("data_pos.json", 'r+') as f:
     # indent=2 is not needed but makes the file human-readable
-    data_pos_prev = json.load(f)
-    data_pos_prev.update(test)
+    data_pos_final = json.load(f)
+    data_pos_final.update(data_pos)
     f.seek(0)
-    json.dump(test, f, indent=2)
-"""
+    json.dump(data_pos_final, f, indent=2)
+
+
 plt.figure(1)
 plt.plot(data_pos_L,'b--',label=r'Position LF')
 plt.plot(data_pos_R,'r--',label=r'Position RF')
 plt.xlabel('time(s)')
 plt.ylabel('deg')
 plt.legend(loc='best')
-plt.savefig(filename)"""
+plt.savefig(filename)
 
 # deconnecting
 my_dxl_L.disable_torque()
