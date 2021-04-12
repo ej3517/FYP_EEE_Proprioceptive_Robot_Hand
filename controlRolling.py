@@ -3,6 +3,16 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import cv2
+
+# cap correspond to the external webcam
+cap = cv2.VideoCapture(0)
+
+# Define the codec and create VideoWriter object
+fps = 20.0
+capSize = (1920, 1080)  # this is the size of my source video
+fourcc = cv2.VideoWriter_fourcc(*'XVID')
+out = cv2.VideoWriter('output.avi', fourcc, fps, capSize)
 
 # create motor object
 my_dxl_L = XH430(1)
@@ -24,6 +34,11 @@ my_dxl_R.enable_torque()
 # check operating mode
 my_dxl_L.get_operating_mode()
 my_dxl_R.get_operating_mode()
+
+
+def get_time(start_time):
+    current_time = time.time() - start_time
+    return current_time
 
 
 def deg2pos(angle):
@@ -59,10 +74,10 @@ def set_current_control_mode(motor):
         motor.set_current(-30)  # low torque
 
 
-def singleAct(motor_object, torque_motor, traj, dt, forward):
+def singleAct(motor_object, torque_motor, traj, dt, forward, start_time, record, capture=cap, video_file=out):
     """change position of one actuator with a given speed """
-    data_pos = []
-    data_pos_torque = []
+    data_pos = [[], []]
+    data_pos_torque = [[], []]
     motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
     if forward:
         forward_coeff = 1
@@ -71,8 +86,16 @@ def singleAct(motor_object, torque_motor, traj, dt, forward):
         forward_coeff = -1
         last_index = 0
     start_pos = motor_object.get_position()
-    data_pos += [start_pos]
-    data_pos_torque += [torque_motor.get_position()]
+    data_pos[0] += [start_pos]
+    data_pos[1] += [get_time(start_time)]
+    data_pos_torque[0] += [torque_motor.get_position()]
+    data_pos_torque[1] += [get_time(start_time)]
+    if record and capture.isOpened():
+        ret, frame = capture.read()
+        if ret:
+            # write the frame
+            video_file.write(frame)
+
     gradient = int(motionGradient(traj, dt))  # gradient of the motion
     step = 1
     while abs(step) <= dt:
@@ -80,15 +103,29 @@ def singleAct(motor_object, torque_motor, traj, dt, forward):
         input_pos = motor_object.set_position(input_pos)
         while 1:
             present_pos = motor_object.get_position()
-            data_pos += [present_pos]
-            data_pos_torque += [torque_motor.get_position()]
+            data_pos[0] += [present_pos]
+            data_pos[1] += [get_time(start_time)]
+            data_pos_torque[0] += [torque_motor.get_position()]
+            data_pos_torque[1] += [get_time(start_time)]
+            if record and capture.isOpened():
+                ret, frame = capture.read()
+                if ret:
+                    # write the frame
+                    video_file.write(frame)
             if not abs(input_pos - present_pos) > motor_object.DXL_MOVING_STATUS_THRESHOLD:
                 step += 1
                 break
     motor_object.set_position(traj[last_index])
     time.sleep(.75)  # time for the actuator to reach the final position
-    data_pos += [motor_object.get_position()]
-    data_pos_torque += [torque_motor.get_position()]
+    data_pos[0] += [motor_object.get_position()]
+    data_pos[1] += [get_time(start_time)]
+    data_pos_torque[0] += [torque_motor.get_position()]
+    data_pos_torque[1] += [get_time(start_time)]
+    if record and capture.isOpened():
+        ret, frame = capture.read()
+        if ret:
+            # write the frame
+            video_file.write(frame)
     return [data_pos, data_pos_torque]
 
 
@@ -144,10 +181,12 @@ def graspManip(motor_L, motor_R, traj, dt, forward):
 ######### control of the entire motion #########
 
 
-def controlRolling(motor_L, motor_R, traj):
+def controlRolling(motor_L, motor_R, traj, capture=cap, video_file=out):
     # PUT THE FINGERS AT THEIR INITIAL POSITION
-    data_pos_L = []
-    data_pos_R = []
+    continue_record = True
+
+    data_pos_L = [[], []]
+    data_pos_R = [[], []]
     clockwise = True
     anticlockwise = False
     iniPosition(motor_L, motor_R, traj)
@@ -155,67 +194,90 @@ def controlRolling(motor_L, motor_R, traj):
     dt = 70  # int(input("How long do you want the motion to last :"))
     # INITIALIZE THE GRASP
     graspManip(motor_L, motor_R, traj, dt, clockwise)
+
     ######## CLOCKWISE MOTION
     # LF TORQUE MODE
     pos_L = motor_L.get_position()
     set_current_control_mode(motor_L)
     # RF NEW TRAJECTORY
     time.sleep(.75)
-    # INITIALIZE LIST OF POSITION
-    pos_R = motor_R.get_position()
-    data_pos_R += [pos_R]
-    data_pos_L += [pos_L]
+
+    # START THE CLOCK
+    start_manip = time.time()
+
     # RF TRAJECTORY
+    pos_R = motor_R.get_position()
     new_traj = [*range(pos_R, traj[-1], 1)]
     # RF POSITION MODE AND START CLOCKWISE MOTION
-    list_pos_RL = singleAct(motor_R, motor_L, new_traj, dt, clockwise)
-    data_pos_R += list_pos_RL[0]
-    data_pos_L += list_pos_RL[1]
+    list_pos_RL = singleAct(motor_R, motor_L, new_traj, dt, clockwise, start_manip, continue_record)
+
+    # UPDATE LIST
+    data_pos_R[0] += list_pos_RL[0][0]
+    data_pos_R[1] += list_pos_RL[0][1]
+    data_pos_L[0] += list_pos_RL[1][0]
+    data_pos_L[1] += list_pos_RL[1][1]
+
     ######## ANTICLOCKWISE MOTION
     # LF POSITION CONTROL MODE
     motor_L.set_operating_mode(motor_L.POSITION_CONTROL_MODE)
     # RF CURRENT CONTROL MODE
-    pos_R = motor_R.get_position()
-    data_pos_R += [pos_R]
     set_current_control_mode(motor_R)
     time.sleep(.75)
+
     # LF NEW TRAJECTORY
     pos_L = motor_L.get_position()
-    data_pos_L += [pos_L]
     new_traj = [*range(traj[0], pos_L, 1)]
     time.sleep(.75)
     # LF ANTICLOCKWISE MOTION
-    list_pos_LR = singleAct(motor_L, motor_R, new_traj, dt, anticlockwise)
-    data_pos_L += list_pos_LR[0]
-    data_pos_R += list_pos_LR[1]
+    list_pos_LR = singleAct(motor_L, motor_R, new_traj, dt, anticlockwise, start_manip, continue_record)
+
+    data_pos_L[0] += list_pos_LR[0][0]
+    data_pos_L[1] += list_pos_LR[0][1]
+    data_pos_R[0] += list_pos_LR[1][0]
+    data_pos_R[1] += list_pos_LR[1][1]
+
     ######## CLOCKWISE MOTION
     # RF POSITION CONTROL MODE
     motor_R.set_operating_mode(motor_R.POSITION_CONTROL_MODE)
     # RF CURRENT CONTROL MODE
-    pos_L = motor_L.get_position()
-    data_pos_L += [pos_L]
     set_current_control_mode(motor_L)
     time.sleep(.75)
+
     # RF NEW TRAJECTORY
     pos_R = motor_R.get_position()
-    data_pos_R += [pos_R]
     new_traj = [*range(pos_R, traj[-1], 1)]
     time.sleep(.75)
     # RF CLOCKWISE MOTION
-    list_pos_RL = singleAct(motor_R, motor_L, new_traj, dt, clockwise)
-    data_pos_R += list_pos_RL[0]
-    data_pos_L += list_pos_RL[1]
+    list_pos_RL = singleAct(motor_R, motor_L, new_traj, dt, clockwise, start_manip, continue_record)
+
+    data_pos_R[0] += list_pos_RL[0][0]
+    data_pos_R[1] += list_pos_RL[0][1]
+    data_pos_L[0] += list_pos_RL[1][0]
+    data_pos_L[1] += list_pos_RL[1][1]
     # LF POSITION CONTROL MODE
     motor_L.set_operating_mode(motor_L.POSITION_CONTROL_MODE)
+
+    # STOP RECORDING
+    continue_record = False
+    # GO BACK TO INITIAL POSITION
     time.sleep(.75)
     new_traj_L = [*range(2047, motor_L.get_position(), 1)]
     new_traj_R = [*range(2047, motor_R.get_position(), 1)]
-    singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise)
-    singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise)
+    singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise, start_manip, continue_record)
+    singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip, continue_record)
     return [data_pos_L, data_pos_R]
 
-#### DATA COLLECTION
+
+####### CALL THE MAIN FUNCTION #######
 [data_pos_L, data_pos_R] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
+
+
+# STOP RECORDING
+# Release everything if job is finished
+cap.release()
+out.release()
+cv2.destroyAllWindows()
+
 
 #### STORE THE DATA INTO A JSON FILE
 filename = "trial obj(square) pos(up) dim(2x2)"
@@ -229,25 +291,28 @@ data_pos = {
 
 ### initialize the json file
 #with open("data_pos.json", 'w') as f:
-    # indent=2 is not needed but makes the file human-readable
-    #json.dump(data_pos, f, indent=2)
+# indent=2 is not needed but makes the file human-readable
+#json.dump(data_pos, f, indent=2)
 
 
+"""
 with open("data_pos.json", 'r+') as f:
     # indent=2 is not needed but makes the file human-readable
     data_pos_final = json.load(f)
     data_pos_final.update(data_pos)
     f.seek(0)
     json.dump(data_pos_final, f, indent=2)
-
+"""
 
 plt.figure(1)
-plt.plot(data_pos_L,'b--',label=r'Position LF')
-plt.plot(data_pos_R,'r--',label=r'Position RF')
+plt.plot(data_pos_L[1], data_pos_L[0],'b--',label=r'Position LF')
+plt.plot(data_pos_R[1], data_pos_R[0],'r--',label=r'Position RF')
 plt.xlabel('time(s)')
 plt.ylabel('deg')
 plt.legend(loc='best')
-plt.savefig(filename)
+
+plt.show()  # display without saving
+#plt.savefig(filename)
 
 # deconnecting
 my_dxl_L.disable_torque()
