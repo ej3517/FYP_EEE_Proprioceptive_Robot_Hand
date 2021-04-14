@@ -35,12 +35,20 @@ my_dxl_R.enable_torque()
 my_dxl_L.get_operating_mode()
 my_dxl_R.get_operating_mode()
 
+# FONT PARAMETERS
+font = cv2.FONT_HERSHEY_SIMPLEX
+bottomLeftCornerOfText = (10, 100)
+fontScale = 3
+fontColor = (255, 0, 0)  # red
+lineType = 2
 
+# CLOCK SET UP
 def get_time(start_time):
     current_time = time.time() - start_time
     return current_time
 
 
+# CONVERTER ANGLE TO POSITION
 def deg2pos(angle):
     return int(4095.0/360*angle + 4095.0/4)
 
@@ -66,6 +74,7 @@ def iniPosition(motor_L, motor_R, traj):
     motor_R.set_position(traj[-1])
     time.sleep(2)
 
+
 def set_current_control_mode(motor):
     motor.set_operating_mode(motor.CURRENT_CONTROL_MODE)
     if motor.id == 1:
@@ -76,8 +85,12 @@ def set_current_control_mode(motor):
 
 def singleAct(motor_object, torque_motor, traj, dt, forward, start_time, record, capture=cap, video_file=out):
     """change position of one actuator with a given speed """
+    # INITIALIZATION
+    pict_nb = 1
     data_pos = [[], []]
     data_pos_torque = [[], []]
+    corners_list = []
+    # MOTORS
     motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
     if forward:
         forward_coeff = 1
@@ -95,6 +108,13 @@ def singleAct(motor_object, torque_motor, traj, dt, forward, start_time, record,
         if ret:
             # write the frame
             video_file.write(frame)
+            cv2.imshow('frame', frame)
+            if cv2.waitKey(1) & 0xFF == ord('a'):
+                corners_list += [[get_time(start_time), data_pos_torque[0][-1]]]
+                picture_name = "corner_picture_" + str(pict_nb) + ".png"
+                cv2.putText(frame, str(get_time(start_time))[:5], bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
+                cv2.imwrite(picture_name, frame)
+                pict_nb += 1
 
     gradient = int(motionGradient(traj, dt))  # gradient of the motion
     step = 1
@@ -112,6 +132,13 @@ def singleAct(motor_object, torque_motor, traj, dt, forward, start_time, record,
                 if ret:
                     # write the frame
                     video_file.write(frame)
+                    cv2.imshow('frame', frame)
+                    if cv2.waitKey(1) & 0xFF == ord('a'):
+                        corners_list += [[get_time(start_time), data_pos_torque[0][-1]]]
+                        picture_name = "corner_picture_" + str(pict_nb) + ".png"
+                        cv2.putText(frame, str(get_time(start_time))[:5], bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
+                        cv2.imwrite(picture_name, frame)
+                        pict_nb += 1
             if not abs(input_pos - present_pos) > motor_object.DXL_MOVING_STATUS_THRESHOLD:
                 step += 1
                 break
@@ -126,7 +153,14 @@ def singleAct(motor_object, torque_motor, traj, dt, forward, start_time, record,
         if ret:
             # write the frame
             video_file.write(frame)
-    return [data_pos, data_pos_torque]
+            cv2.imshow('frame', frame)
+            if cv2.waitKey(1) & 0xFF == ord('a'):
+                corners_list += [[get_time(start_time), data_pos_torque[0][-1]]]
+                picture_name = "corner_picture_" + str(pict_nb) + ".png"
+                cv2.putText(frame, str(get_time(start_time))[:5], bottomLeftCornerOfText, font, fontScale, fontColor, lineType)
+                cv2.imwrite(picture_name, frame)
+                pict_nb += 1
+    return [data_pos, data_pos_torque, corners_list]
 
 
 def graspManip(motor_L, motor_R, traj, dt, forward):
@@ -184,9 +218,10 @@ def graspManip(motor_L, motor_R, traj, dt, forward):
 def controlRolling(motor_L, motor_R, traj, capture=cap, video_file=out):
     # PUT THE FINGERS AT THEIR INITIAL POSITION
     continue_record = True
-
+    # INITIALIZATION DATA
     data_pos_L = [[], []]
     data_pos_R = [[], []]
+    corners = []
     clockwise = True
     anticlockwise = False
     iniPosition(motor_L, motor_R, traj)
@@ -216,6 +251,7 @@ def controlRolling(motor_L, motor_R, traj, capture=cap, video_file=out):
     data_pos_R[1] += list_pos_RL[0][1]
     data_pos_L[0] += list_pos_RL[1][0]
     data_pos_L[1] += list_pos_RL[1][1]
+    corners += list_pos_RL[2]
 
     ######## ANTICLOCKWISE MOTION
     # LF POSITION CONTROL MODE
@@ -235,6 +271,7 @@ def controlRolling(motor_L, motor_R, traj, capture=cap, video_file=out):
     data_pos_L[1] += list_pos_LR[0][1]
     data_pos_R[0] += list_pos_LR[1][0]
     data_pos_R[1] += list_pos_LR[1][1]
+    corners += list_pos_RL[2]
 
     ######## CLOCKWISE MOTION
     # RF POSITION CONTROL MODE
@@ -254,6 +291,7 @@ def controlRolling(motor_L, motor_R, traj, capture=cap, video_file=out):
     data_pos_R[1] += list_pos_RL[0][1]
     data_pos_L[0] += list_pos_RL[1][0]
     data_pos_L[1] += list_pos_RL[1][1]
+    corners += list_pos_RL[2]
     # LF POSITION CONTROL MODE
     motor_L.set_operating_mode(motor_L.POSITION_CONTROL_MODE)
 
@@ -265,54 +303,62 @@ def controlRolling(motor_L, motor_R, traj, capture=cap, video_file=out):
     new_traj_R = [*range(2047, motor_R.get_position(), 1)]
     singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise, start_manip, continue_record)
     singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip, continue_record)
-    return [data_pos_L, data_pos_R]
+    return [data_pos_L, data_pos_R, corners]
+
+
+def plot_pos_evol(thetaL, thetaR, file):
+    """ plotting """
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(thetaL[1], thetaL[0], label=r'$\theta_L$')
+    ax.plot(thetaR[1], thetaR[0], label=r'$\theta_R$')
+    ax.legend(loc='upper right')
+    plt.title("Fingers' Position - Rolling Manipulation ")
+    plt.ylabel('deg')
+    plt.xlabel('time')
+    plt.grid()
+    plt.savefig(file)
 
 
 ####### CALL THE MAIN FUNCTION #######
-[data_pos_L, data_pos_R] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
 
+# MANIPULATION
+[data_pos_L, data_pos_R, corner] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
 
 # STOP RECORDING
-# Release everything if job is finished
 cap.release()
 out.release()
 cv2.destroyAllWindows()
 
+# PLOT
+#filename = "trial obj(square) pos(up) dim(2x2)"
+filename = "trial rolling square 2_5x2_5.png"
 
-#### STORE THE DATA INTO A JSON FILE
-filename = "trial obj(square) pos(up) dim(2x2)"
+plot_pos_evol(data_pos_L, data_pos_R, filename)
+
+# STORE THE DATA  INTO A JSON FILE
 data_pos = {
     filename: {
         "LF": data_pos_L,
-        "RF": data_pos_R
+        "RF": data_pos_R,
+        "corners": corner
     }
 }
 
+# INITIALIZATION
+with open("data_pos.json", 'w') as f:
+    indent = 2  # is not needed but makes the file human-readable
+    json.dump(data_pos, f, indent=2)
 
-### initialize the json file
-#with open("data_pos.json", 'w') as f:
-# indent=2 is not needed but makes the file human-readable
-#json.dump(data_pos, f, indent=2)
+# ONCE INITIALIZED
 
+#with open("data_pos.json", 'r+') as f:
+#    # indent=2 is not needed but makes the file human-readable
+#    data_pos_final = json.load(f)
+#    data_pos_final.update(data_pos)
+#    f.seek(0)
+#    json.dump(data_pos_final, f, indent=2)
 
-"""
-with open("data_pos.json", 'r+') as f:
-    # indent=2 is not needed but makes the file human-readable
-    data_pos_final = json.load(f)
-    data_pos_final.update(data_pos)
-    f.seek(0)
-    json.dump(data_pos_final, f, indent=2)
-"""
-
-plt.figure(1)
-plt.plot(data_pos_L[1], data_pos_L[0],'b--',label=r'Position LF')
-plt.plot(data_pos_R[1], data_pos_R[0],'r--',label=r'Position RF')
-plt.xlabel('time(s)')
-plt.ylabel('deg')
-plt.legend(loc='best')
-
-plt.show()  # display without saving
-#plt.savefig(filename)
 
 # deconnecting
 my_dxl_L.disable_torque()

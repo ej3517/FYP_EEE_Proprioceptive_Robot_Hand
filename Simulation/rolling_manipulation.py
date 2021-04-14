@@ -226,7 +226,7 @@ def plot_pos_evol(thetaL,thetaR):
     ax = fig.add_subplot(111)
     ax.plot(thetaL, label = r'$\theta_L$')
     ax.plot(thetaR, label = r'$\theta_R$')
-    ax.legend(loc='upper right')
+    ax.legend(loc='lower right')
     plt.title("Fingers' Position - Rolling Simulation ")
     plt.ylabel('deg')
     plt.xlabel('time')
@@ -258,7 +258,9 @@ def manipulation_simulation(sqrt_dim, ini_drf, gap, minang, maxang):
     pos_l += next_pos_l
     pos_r += next_pos_r
     ### final plot of the angle evolution
-    plot_pos_evol(pos_l,pos_r)
+    final_pos_l = [deg2pos(180-el) for el in pos_l]
+    final_pos_r = [deg2pos(180-el) for el in pos_r]
+    plot_pos_evol(final_pos_l, final_pos_r)
 
 ##### initialisation
 sqrt_side = 25
