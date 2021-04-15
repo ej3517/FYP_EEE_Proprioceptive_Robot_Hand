@@ -81,7 +81,7 @@ def ini_left_contact(face,c,d):
 
 # create loop for the animation
 
-def rolling_simulation_side(a, b, c, d, s,traj, forward):
+def rolling_simulation_side(a, b, c, d, s,traj, forward, counter):
     """s : diagonal in this case """
     keep_data = True
     list_theta_l = []
@@ -112,14 +112,14 @@ def rolling_simulation_side(a, b, c, d, s,traj, forward):
         # if a corner is identified
         if corner_identification(B1,G1,C1):
             a = a-b
-            [next_theta_l, next_theta_r, a, c] = rolling_simulation_diag(a, s, c, d, b, traj[i:-1], forward)
+            [next_theta_l, next_theta_r, a, c, counter] = rolling_simulation_diag(a, s, c, d, b, traj[i:-1], forward, counter)
             list_theta_l += next_theta_l
             list_theta_r += next_theta_r
             keep_data = False
             break
         elif corner_identification(C1,H1,B1):
             c = c-b
-            [next_theta_l, next_theta_r, a, c] = rolling_simulation_diag(a, s, c, d, b, traj[i:-1], forward)
+            [next_theta_l, next_theta_r, a, c, counter] = rolling_simulation_diag(a, s, c, d, b, traj[i:-1], forward, counter)
             list_theta_l += next_theta_l
             list_theta_r += next_theta_r
             keep_data = False
@@ -129,11 +129,12 @@ def rolling_simulation_side(a, b, c, d, s,traj, forward):
             list_theta_l += [theta_l*180/math.pi]
             list_theta_r += [theta_r*180/math.pi]
         ## plot
-        #plot_scene(A1,B1,C1,D1,E1,F1,G1,H1)
-    return [list_theta_l, list_theta_r, a, c]
+        plot_scene(A1, B1, C1, D1, E1, F1, G1, H1, counter)
+        counter += 1
+    return [list_theta_l, list_theta_r, a, c, counter]
 
 
-def rolling_simulation_diag(a, b, c, d, s, traj, forward):
+def rolling_simulation_diag(a, b, c, d, s, traj, forward, counter):
     """a:left ; b:diag ; c:right ; d:bottom ; f:side"""
     keep_data = True
     list_theta_l = []
@@ -164,19 +165,19 @@ def rolling_simulation_diag(a, b, c, d, s, traj, forward):
         # if a corner is identified
         if corner_identification(C1,D1,F1):
             c = c+s
-            [next_theta_l, next_theta_r, a, c] = rolling_simulation_side(a, s, c, d, b, traj[i:-1], forward)
+            [next_theta_l, next_theta_r, a, c, counter] = rolling_simulation_side(a, s, c, d, b, traj[i:-1], forward, counter)
             list_theta_l += next_theta_l
             list_theta_r += next_theta_r
             keep_data = False
             break
         elif corner_identification(C1,H1,E1):
             c = c-s
-            rolling_simulation_diag(a, s, c, d, b, traj[i:-1], forward)
+            rolling_simulation_diag(a, s, c, d, b, traj[i:-1], forward, counter)
             keep_data = False
             break
         elif corner_identification(B1,A1,F1):
             a = a+s
-            [next_theta_l, next_theta_r, a, c] = rolling_simulation_side(a, s, c, d, b, traj[i:-1], forward)
+            [next_theta_l, next_theta_r, a, c, counter] = rolling_simulation_side(a, s, c, d, b, traj[i:-1], forward, counter)
             list_theta_l += next_theta_l
             list_theta_r += next_theta_r
             keep_data = False
@@ -187,13 +188,14 @@ def rolling_simulation_diag(a, b, c, d, s, traj, forward):
             list_theta_l += [theta_l*180/math.pi]
             list_theta_r += [theta_r*180/math.pi]
         # plot
-        #plot_scene(A1,B1,C1,D1,E1,F1,G1,H1)
-    return [list_theta_l, list_theta_r, a, c]
+        plot_scene(A1, B1, C1, D1, E1, F1, G1, H1, counter)
+        counter += 1
+    return [list_theta_l, list_theta_r, a, c, counter]
 
 
 ####### Animation #########
 
-def plot_scene(A,B,C,D,E,F,G,H):
+def plot_scene(A,B,C,D,E,F,G,H,nb_image):
     """ plotting """
     plt.figure()
     ax = plt.axes()
@@ -219,6 +221,8 @@ def plot_scene(A,B,C,D,E,F,G,H):
     plt.plot(F[0],F[1],'o',markersize=5,color='orange')
     plt.xlim([-80,160])
     plt.ylim([-60,180])
+    plt.savefig("simulation_rolling_images/img_"+str(nb_image)+".png")
+    plt.close()
 
 def plot_pos_evol(thetaL,thetaR):
     """ plotting """
@@ -241,6 +245,7 @@ def manipulation_simulation(sqrt_dim, ini_drf, gap, minang, maxang):
     increasing = True
     trajectory_increasing = list_of_angle(minang,maxang,increasing)
     trajectory_decreasing = list_of_angle(maxang,minang,not increasing)
+    image_counter = 0
     ## geometry
     sqrt_diag = math.sqrt(2)*sqrt_dim # square's diagonal
     drf = ini_drf
@@ -248,13 +253,13 @@ def manipulation_simulation(sqrt_dim, ini_drf, gap, minang, maxang):
     ang90 = deg2rad(90)
     ## first clockwise motion
     trajectory = [element for element in trajectory_decreasing if element < ang90]
-    [pos_l, pos_r, dlf, drf] = rolling_simulation_diag(dlf, sqrt_diag, drf, finger_gap, sqrt_dim, trajectory, clockwise)
+    [pos_l, pos_r, dlf, drf, image_counter] = rolling_simulation_diag(dlf, sqrt_diag, drf, finger_gap, sqrt_dim, trajectory, clockwise, image_counter)
     #### anticlockwise motion
-    [next_pos_l, next_pos_r, dlf, drf] = rolling_simulation_diag(dlf, sqrt_diag, drf, finger_gap, sqrt_dim, trajectory_increasing, not clockwise)
+    [next_pos_l, next_pos_r, dlf, drf, image_counter] = rolling_simulation_diag(dlf, sqrt_diag, drf, finger_gap, sqrt_dim, trajectory_increasing, not clockwise, image_counter)
     pos_l += next_pos_l
     pos_r += next_pos_r
     #### anticlockwise motion
-    [next_pos_l, next_pos_r, dlf, drf] = rolling_simulation_diag(dlf, sqrt_diag, drf, finger_gap, sqrt_dim, trajectory_decreasing, clockwise)
+    [next_pos_l, next_pos_r, dlf, drf, image_counter] = rolling_simulation_diag(dlf, sqrt_diag, drf, finger_gap, sqrt_dim, trajectory_decreasing, clockwise, image_counter)
     pos_l += next_pos_l
     pos_r += next_pos_r
     ### final plot of the angle evolution
