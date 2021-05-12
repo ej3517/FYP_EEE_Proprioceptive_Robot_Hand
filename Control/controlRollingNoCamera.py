@@ -41,7 +41,7 @@ def deg2pos(angle):
 
 
 # Linear Trajectory to follow
-lin_traj = [*range(deg2pos(40), deg2pos(140), 1)]  # from 70deg to 110deg
+lin_traj = [*range(deg2pos(65), deg2pos(115), 1)]  # from 70deg to 110deg
 
 
 def motionGradient(traj, dt):
@@ -100,10 +100,10 @@ def singleAct(motor_object, torque_motor, traj, dt, forward, start_time):
 
     motor_object.set_position(traj[last_index])
     time.sleep(.75)  # time for the actuator to reach the final position
-    data_pos[0] += [motor_object.get_position()]
-    data_pos[1] += [get_time(start_time)]
-    data_pos_torque[0] += [torque_motor.get_position()]
-    data_pos_torque[1] += [get_time(start_time)]
+    #data_pos[0] += [motor_object.get_position()]
+    #data_pos[1] += [get_time(start_time)]
+    #data_pos_torque[0] += [torque_motor.get_position()]
+    #data_pos_torque[1] += [get_time(start_time)]
     return [data_pos, data_pos_torque]
 
 
@@ -163,6 +163,8 @@ def controlRolling(motor_L, motor_R, traj):
     # INITIALIZATION DATA
     data_pos_L = [[], []]
     data_pos_R = [[], []]
+    dict_pos = {}
+
     clockwise = True
     anticlockwise = False
     iniPosition(motor_L, motor_R, traj)
@@ -216,6 +218,9 @@ def controlRolling(motor_L, motor_R, traj):
     data_pos_R[0] += list_pos_LR[1][0]
     data_pos_R[1] += list_pos_LR[1][1]
 
+    dict_pos["LF_motion1"] = [list_pos_LR[0][0], list_pos_LR[0][1]]
+    dict_pos["RF_motion1"] = [list_pos_LR[1][0], list_pos_LR[1][1]]
+
     ######## SECOND MANIPUALTION --> CLOCKWISE MOTION ########
     # RF POSITION CONTROL MODE
     motor_R.set_operating_mode(motor_R.POSITION_CONTROL_MODE)
@@ -237,6 +242,9 @@ def controlRolling(motor_L, motor_R, traj):
     data_pos_L[0] += list_pos_RL[1][0]
     data_pos_L[1] += list_pos_RL[1][1]
 
+    dict_pos["LF_motion2"] = [list_pos_RL[1][0], list_pos_RL[1][1]]
+    dict_pos["RF_motion2"] = [list_pos_RL[0][0], list_pos_RL[0][1]]
+
     # LF POSITION CONTROL MODE
     motor_L.set_operating_mode(motor_L.POSITION_CONTROL_MODE)
 
@@ -246,7 +254,7 @@ def controlRolling(motor_L, motor_R, traj):
     new_traj_R = [*range(2047, motor_R.get_position(), 1)]
     singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise, start_manip)
     singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip)
-    return [data_pos_L, data_pos_R]
+    return [data_pos_L, data_pos_R, dict_pos]
 
 
 def plot_pos_evol(thetaL, thetaR, file):
@@ -264,56 +272,57 @@ def plot_pos_evol(thetaL, thetaR, file):
 
     fig, ax = plt.subplots()
     plt.style.use("ggplot")
-    plt.rcParams["figure.figsize"] = (12,8)
+    plt.rcParams["figure.figsize"] = (12, 8)
+    time.sleep(1)
     ax.plot(thetaL[1], thetaL[0], label=r'$\theta_L$')
     ax.plot(thetaR[1], thetaR[0], label=r'$\theta_R$')
     ax.legend(loc='upper right')
-    plt.title("Fingers' Position - Rolling Manipulation ")
+    plt.title("square rolling "+file)
     plt.ylabel('position(deg)')
     plt.xlabel('time(s)')
-    plt.show()
-    #plt.savefig(file)
+    plt.savefig(file)
 
 
 ####### CALL THE MAIN CONTROL FUNCTION #######
 
 # MANIPULATION
-[data_pos_L, data_pos_R] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
+[data_pos_L, data_pos_R, data_pos_trial] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
+print(data_pos_trial)
 
 ####### PLOT THE RESULTS #######
-#filename = "trial obj(square) pos(up) dim(2x2)"
-filename = "trial rolling square 2_5x2_5.png"
-
+filename = "dim_"+str(30)+"_pose_"+str(70)+"_gap_"+str(42)+"_2"
+plot_pos_evol(data_pos_L, data_pos_R, filename)
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 
 # STORE THE DATA  INTO A JSON FILE
 data_pos = {
-    filename: {
-        "LF": data_pos_L,
-        "RF": data_pos_R,
-    }
+    filename: data_pos_trial
 }
-print("ALL THE INTERESTING VALUE\n")
-print("data left fingers\n")
-print(data_pos_L)
-print("\ndata right fingers\n")
-print(data_pos_R)
-print("\nthe associated dictionary\n")
-print(data_pos)
+
 
 # INITIALIZATION
-#with open("data_pos.json", 'w') as f:
-#    indent = 2  # is not needed but makes the file human-readable
-#    json.dump(data_pos, f, indent=2)
+def user_input():
+    ans = input("Continue ? y/n : ")
+    if ans == "n":
+        return False
+    else:
+        return True
+
+
+#if user_input():
+#    with open("data_pos_trial.json", 'w') as f:
+#        indent = 2  # is not needed but makes the file human-readable
+#        json.dump(data_pos, f, indent=2)
 
 # ONCE INITIALIZED
 
-#with open("data_pos.json", 'r+') as f:
-#    # indent=2 is not needed but makes the file human-readable
-#    data_pos_final = json.load(f)
-#    data_pos_final.update(data_pos)
-#    f.seek(0)
-#    json.dump(data_pos_final, f, indent=2)
+if user_input():
+    with open("data_pos_trial.json", 'r+') as f:
+        # indent=2 is not needed but makes the file human-readable
+        data_pos_final = json.load(f)
+        data_pos_final.update(data_pos)
+        f.seek(0)
+        json.dump(data_pos_final, f, indent=2)
 
 
 # deconnecting
