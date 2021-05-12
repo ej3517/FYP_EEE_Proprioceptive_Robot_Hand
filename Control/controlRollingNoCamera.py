@@ -290,7 +290,7 @@ def plot_pos_evol(thetaL, thetaR, file):
 print(data_pos_trial)
 
 ####### PLOT THE RESULTS #######
-filename = "dim_"+str(30)+"_pose_"+str(70)+"_gap_"+str(42)+"_2"
+filename = "dim_"+str(30)+"_pose_"+str(70)+"_gap_"+str(34)+"_2"
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 
