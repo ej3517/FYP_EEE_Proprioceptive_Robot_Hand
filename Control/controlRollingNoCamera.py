@@ -41,7 +41,7 @@ def deg2pos(angle):
 
 
 # Linear Trajectory to follow
-lin_traj = [*range(deg2pos(65), deg2pos(115), 1)]  # from 70deg to 110deg
+lin_traj = [*range(deg2pos(60), deg2pos(120), 1)]  # from 70deg to 110deg
 
 
 def motionGradient(traj, dt):
@@ -316,13 +316,13 @@ def user_input():
 
 # ONCE INITIALIZED
 
-if user_input():
-    with open("data_pos_trial.json", 'r+') as f:
-        # indent=2 is not needed but makes the file human-readable
-        data_pos_final = json.load(f)
-        data_pos_final.update(data_pos)
-        f.seek(0)
-        json.dump(data_pos_final, f, indent=2)
+#if user_input():
+#    with open("data_pos_trial.json", 'r+') as f:
+#        # indent=2 is not needed but makes the file human-readable
+#        data_pos_final = json.load(f)
+#        data_pos_final.update(data_pos)
+#        f.seek(0)
+#        json.dump(data_pos_final, f, indent=2)
 
 
 # deconnecting
