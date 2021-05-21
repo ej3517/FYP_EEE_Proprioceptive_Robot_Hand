@@ -290,7 +290,7 @@ def plot_pos_evol(thetaL, thetaR, file):
 print(data_pos_trial)
 
 ####### PLOT THE RESULTS #######
-filename = "dim_"+str(30)+"_pose_"+str(70)+"_gap_"+str(34)+"_2"
+filename = "dim_"+str(25)+"_pose_"+str(60)+"_gap_"+str(34)+"_2"
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 
@@ -310,19 +310,19 @@ def user_input():
 
 
 #if user_input():
-#    with open("data_pos_trial.json", 'w') as f:
+#    with open("data_pos_trial_circle.json", 'w') as f:
 #        indent = 2  # is not needed but makes the file human-readable
 #        json.dump(data_pos, f, indent=2)
 
 # ONCE INITIALIZED
 
-#if user_input():
-#    with open("data_pos_trial.json", 'r+') as f:
-#        # indent=2 is not needed but makes the file human-readable
-#        data_pos_final = json.load(f)
-#        data_pos_final.update(data_pos)
-#        f.seek(0)
-#        json.dump(data_pos_final, f, indent=2)
+if user_input():
+    with open("data_pos_trial_circle.json", 'r+') as f:
+        # indent=2 is not needed but makes the file human-readable
+        data_pos_final = json.load(f)
+        data_pos_final.update(data_pos)
+        f.seek(0)
+        json.dump(data_pos_final, f, indent=2)
 
 
 # deconnecting
