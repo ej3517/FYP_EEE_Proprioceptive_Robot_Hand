@@ -291,7 +291,7 @@ print(data_pos_trial)
 
 ####### PLOT THE RESULTS #######
 #filename = "dim_"+str(25)+"_pose_"+str(70)+"_gap_"+str(50)+"_2"
-filename = "dim_"+str(20)+"_"+str(25)+"_pose_"+str(70)+"_gap_"+str(50)+"_2" # rectangle (1st dim stick to right finger at the beginning of the manipulation
+filename = "dim_"+str(20)+"_"+str(25)+"_pose_"+str(60)+"_gap_"+str(50)+"_1" # rectangle (1st dim stick to right finger at the beginning of the manipulation
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 plot_pos_evol(data_pos_L, data_pos_R, filename)
 
