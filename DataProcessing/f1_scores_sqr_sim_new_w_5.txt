@@ -1,0 +1,53 @@
+All the F1-score and accuracy of the squares simulation for window of size 5 
+
+SAME SIZE 
+
+The average f1-score for squares of dim =20 and 2-means clustering : 0.8147777777777777
+The average f1-score for squares of dim =20 and 3-means clustering : 0.4547777777777778
+The average accuracy for squares of dim =20 and 3-means clustering : 0.476
+
+The average f1-score for squares of dim =25 and 2-means clustering : 0.8634444444444445
+The average f1-score for squares of dim =25 and 3-means clustering : 0.8147777777777778
+The average accuracy for squares of dim =25 and 3-means clustering : 0.842
+
+The average f1-score for squares of dim =30 and 2-means clustering : 0.8477777777777777
+The average f1-score for squares of dim =30 and 3-means clustering : 0.7011111111111111
+The average accuracy for squares of dim =30 and 3-means clustering : 0.7071111111111111
+
+
+SAME POSE 
+
+The average f1-score for squares with pose =60 and 2-means clustering : 0.833
+The average f1-score for squares with pose =60 and 3-means clustering : 0.6736666666666667
+The average accuracy for squares with pose =60 and 3-means clustering : 0.7192222222222223
+
+The average f1-score for squares with pose =65 and 2-means clustering : 0.847
+The average f1-score for squares with pose =65 and 3-means clustering : 0.5843333333333333
+The average accuracy for squares with pose =65 and 3-means clustering : 0.5901111111111111
+
+The average f1-score for squares with pose =70 and 2-means clustering : 0.846
+The average f1-score for squares with pose =70 and 3-means clustering : 0.7126666666666668
+The average accuracy for squares with pose =70 and 3-means clustering : 0.7157777777777778
+
+
+SAME GAP 
+
+The average f1-score for squares with fingers gap =34 and 2-means clustering : 0.8583333333333333
+The average f1-score for squares with fingers gap =34 and 3-means clustering : 0.7628888888888888
+The average accuracy for squares with fingers gap =34 and 3-means clustering : 0.7868888888888889
+
+The average f1-score for squares with fingers gap =42 and 2-means clustering : 0.823
+The average f1-score for squares with fingers gap =42 and 3-means clustering : 0.48777777777777787
+The average accuracy for squares with fingers gap =42 and 3-means clustering : 0.48066666666666674
+
+The average f1-score for squares with fingers gap =50 and 2-means clustering : 0.8446666666666667
+The average f1-score for squares with fingers gap =50 and 3-means clustering : 0.7200000000000001
+The average accuracy for squares with fingers gap =50 and 3-means clustering : 0.7575555555555555
+
+
+TOTAL AVERAGE 
+
+The total average f1-score for squares and 2-means clustering : 0.8420000000000001
+The total average f1-score for squares and 3-means clustering : 0.6568888888888887
+The total average accuracy for squares and 3-means clustering : 0.6750370370370369
+

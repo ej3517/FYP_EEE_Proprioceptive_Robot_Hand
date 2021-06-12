@@ -1,0 +1,272 @@
+{
+  "dim_20_pose_60_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.782608695652174,
+    "The f1_score 3-means global corner identification": 0.43902439024390244,
+    "The f1_score 3-means each corner identification": 0.5573770491803278
+  },
+  "dim_25_pose_60_gap_34_1": {
+    "The f1_score 2-means corner identification": 1.0,
+    "The f1_score 3-means global corner identification": 0.0,
+    "The f1_score 3-means each corner identification": 0.0
+  },
+  "dim_30_pose_60_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.7692307692307693,
+    "The f1_score 3-means global corner identification": 0.6666666666666666,
+    "The f1_score 3-means each corner identification": 0.8524590163934426
+  },
+  "dim_20_pose_60_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.7428571428571429,
+    "The f1_score 3-means global corner identification": 0.1515151515151515,
+    "The f1_score 3-means each corner identification": 0.06557377049180328
+  },
+  "dim_25_pose_60_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.5882352941176471,
+    "The f1_score 3-means global corner identification": 0.4,
+    "The f1_score 3-means each corner identification": 0.4262295081967213
+  },
+  "dim_30_pose_60_gap_42_1": {
+    "The f1_score 2-means corner identification": 1.0,
+    "The f1_score 3-means global corner identification": 0.25,
+    "The f1_score 3-means each corner identification": 0.5081967213114754
+  },
+  "dim_20_pose_60_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.5555555555555556,
+    "The f1_score 3-means global corner identification": 0.40816326530612246,
+    "The f1_score 3-means each corner identification": 0.45901639344262296
+  },
+  "dim_25_pose_60_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.0,
+    "The f1_score 3-means each corner identification": 0.11475409836065574
+  },
+  "dim_30_pose_60_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.32258064516129037,
+    "The f1_score 3-means each corner identification": 0.22950819672131148
+  },
+  "dim_20_pose_65_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.5882352941176471,
+    "The f1_score 3-means global corner identification": 0.4166666666666667,
+    "The f1_score 3-means each corner identification": 0.4426229508196721
+  },
+  "dim_25_pose_65_gap_34_1": {
+    "The f1_score 2-means corner identification": 1.0,
+    "The f1_score 3-means global corner identification": 0.3846153846153846,
+    "The f1_score 3-means each corner identification": 0.7377049180327869
+  },
+  "dim_30_pose_65_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.7142857142857143,
+    "The f1_score 3-means global corner identification": 0.21276595744680848,
+    "The f1_score 3-means each corner identification": 0.39344262295081966
+  },
+  "dim_20_pose_65_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.8387096774193549,
+    "The f1_score 3-means global corner identification": 0.5,
+    "The f1_score 3-means each corner identification": 0.5409836065573771
+  },
+  "dim_25_pose_65_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.6060606060606061,
+    "The f1_score 3-means global corner identification": 0.4166666666666667,
+    "The f1_score 3-means each corner identification": 0.4426229508196721
+  },
+  "dim_30_pose_65_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.45454545454545453,
+    "The f1_score 3-means each corner identification": 0.7377049180327869
+  },
+  "dim_20_pose_65_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.41666666666666663,
+    "The f1_score 3-means each corner identification": 0.45901639344262296
+  },
+  "dim_25_pose_65_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.5555555555555556,
+    "The f1_score 3-means global corner identification": 0.5128205128205129,
+    "The f1_score 3-means each corner identification": 0.6065573770491803
+  },
+  "dim_30_pose_65_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.75,
+    "The f1_score 3-means global corner identification": 0.4444444444444445,
+    "The f1_score 3-means each corner identification": 0.5409836065573771
+  },
+  "dim_20_pose_70_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.03636363636363636,
+    "The f1_score 3-means global corner identification": 0.37037037037037035,
+    "The f1_score 3-means each corner identification": 0.39344262295081966
+  },
+  "dim_25_pose_70_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.8333333333333333,
+    "The f1_score 3-means global corner identification": 0.30303030303030304,
+    "The f1_score 3-means each corner identification": 0.6229508196721312
+  },
+  "dim_30_pose_70_gap_34_1": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.0,
+    "The f1_score 3-means each corner identification": 0.01639344262295082
+  },
+  "dim_20_pose_70_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.03636363636363636,
+    "The f1_score 3-means global corner identification": 0.6222222222222223,
+    "The f1_score 3-means each corner identification": 0.639344262295082
+  },
+  "dim_25_pose_70_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.3902439024390244,
+    "The f1_score 3-means each corner identification": 0.5081967213114754
+  },
+  "dim_30_pose_70_gap_42_1": {
+    "The f1_score 2-means corner identification": 0.8333333333333333,
+    "The f1_score 3-means global corner identification": 0.33333333333333337,
+    "The f1_score 3-means each corner identification": 0.6557377049180327
+  },
+  "dim_20_pose_70_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.6976744186046512,
+    "The f1_score 3-means global corner identification": 0.3846153846153846,
+    "The f1_score 3-means each corner identification": 0.39344262295081966
+  },
+  "dim_25_pose_70_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.5882352941176471,
+    "The f1_score 3-means global corner identification": 0.45000000000000007,
+    "The f1_score 3-means each corner identification": 0.5737704918032787
+  },
+  "dim_30_pose_70_gap_50_1": {
+    "The f1_score 2-means corner identification": 0.5625000000000001,
+    "The f1_score 3-means global corner identification": 0.40909090909090906,
+    "The f1_score 3-means each corner identification": 0.4918032786885246
+  },
+  "dim_20_pose_60_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.3137254901960784,
+    "The f1_score 3-means each corner identification": 0.3442622950819672
+  },
+  "dim_25_pose_60_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.7692307692307693,
+    "The f1_score 3-means global corner identification": 0.2857142857142857,
+    "The f1_score 3-means each corner identification": 0.5901639344262295
+  },
+  "dim_30_pose_60_gap_34_2": {
+    "The f1_score 2-means corner identification": 1.0,
+    "The f1_score 3-means global corner identification": 0.25,
+    "The f1_score 3-means each corner identification": 0.5081967213114754
+  },
+  "dim_20_pose_60_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.07407407407407407,
+    "The f1_score 3-means global corner identification": 0.44,
+    "The f1_score 3-means each corner identification": 0.4426229508196721
+  },
+  "dim_25_pose_60_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.6896551724137931,
+    "The f1_score 3-means global corner identification": 0.3636363636363636,
+    "The f1_score 3-means each corner identification": 0.3442622950819672
+  },
+  "dim_30_pose_60_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.8333333333333333,
+    "The f1_score 3-means global corner identification": 0.3125,
+    "The f1_score 3-means each corner identification": 0.639344262295082
+  },
+  "dim_20_pose_60_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.14814814814814814,
+    "The f1_score 3-means global corner identification": 0.3137254901960784,
+    "The f1_score 3-means each corner identification": 0.39344262295081966
+  },
+  "dim_25_pose_60_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.6206896551724138,
+    "The f1_score 3-means global corner identification": 0.41860465116279066,
+    "The f1_score 3-means each corner identification": 0.5245901639344263
+  },
+  "dim_30_pose_60_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.8333333333333333,
+    "The f1_score 3-means global corner identification": 0.032786885245901634,
+    "The f1_score 3-means each corner identification": 0.01639344262295082
+  },
+  "dim_20_pose_65_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.6896551724137931,
+    "The f1_score 3-means global corner identification": 0.4347826086956522,
+    "The f1_score 3-means each corner identification": 0.4918032786885246
+  },
+  "dim_25_pose_65_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.7692307692307693,
+    "The f1_score 3-means global corner identification": 0.32258064516129037,
+    "The f1_score 3-means each corner identification": 0.639344262295082
+  },
+  "dim_30_pose_65_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.9090909090909091,
+    "The f1_score 3-means global corner identification": 0.23255813953488372,
+    "The f1_score 3-means each corner identification": 0.3770491803278688
+  },
+  "dim_20_pose_65_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.8484848484848485,
+    "The f1_score 3-means global corner identification": 0.3846153846153846,
+    "The f1_score 3-means each corner identification": 0.39344262295081966
+  },
+  "dim_25_pose_65_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.0,
+    "The f1_score 3-means global corner identification": 0.45454545454545453,
+    "The f1_score 3-means each corner identification": 0.5081967213114754
+  },
+  "dim_30_pose_65_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.7142857142857143,
+    "The f1_score 3-means global corner identification": 0.3125,
+    "The f1_score 3-means each corner identification": 0.6229508196721312
+  },
+  "dim_20_pose_65_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.7878787878787877,
+    "The f1_score 3-means global corner identification": 0.42307692307692313,
+    "The f1_score 3-means each corner identification": 0.39344262295081966
+  },
+  "dim_25_pose_65_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.8333333333333333,
+    "The f1_score 3-means global corner identification": 0.5294117647058825,
+    "The f1_score 3-means each corner identification": 0.6557377049180327
+  },
+  "dim_30_pose_65_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.761904761904762,
+    "The f1_score 3-means global corner identification": 0.3888888888888889,
+    "The f1_score 3-means each corner identification": 0.5901639344262295
+  },
+  "dim_20_pose_70_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.7826086956521738,
+    "The f1_score 3-means global corner identification": 0.4,
+    "The f1_score 3-means each corner identification": 0.4426229508196721
+  },
+  "dim_25_pose_70_gap_34_2": {
+    "The f1_score 2-means corner identification": 1.0,
+    "The f1_score 3-means global corner identification": 0.29411764705882354,
+    "The f1_score 3-means each corner identification": 0.5245901639344263
+  },
+  "dim_30_pose_70_gap_34_2": {
+    "The f1_score 2-means corner identification": 0.8333333333333333,
+    "The f1_score 3-means global corner identification": 0.0,
+    "The f1_score 3-means each corner identification": 0.01639344262295082
+  },
+  "dim_20_pose_70_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.7777777777777778,
+    "The f1_score 3-means global corner identification": 0.2153846153846154,
+    "The f1_score 3-means each corner identification": 0.08196721311475409
+  },
+  "dim_25_pose_70_gap_42_2": {
+    "The f1_score 2-means corner identification": 0.6206896551724138,
+    "The f1_score 3-means global corner identification": 0.0,
+    "The f1_score 3-means each corner identification": 0.03278688524590164
+  },
+  "dim_30_pose_70_gap_42_2": {
+    "The f1_score 2-means corner identification": 1.0,
+    "The f1_score 3-means global corner identification": 0.3125,
+    "The f1_score 3-means each corner identification": 0.639344262295082
+  },
+  "dim_20_pose_70_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.7692307692307693,
+    "The f1_score 3-means global corner identification": 0.12903225806451613,
+    "The f1_score 3-means each corner identification": 0.11475409836065574
+  },
+  "dim_25_pose_70_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.9473684210526316,
+    "The f1_score 3-means global corner identification": 0.06349206349206349,
+    "The f1_score 3-means each corner identification": 0.03278688524590164
+  },
+  "dim_30_pose_70_gap_50_2": {
+    "The f1_score 2-means corner identification": 0.7142857142857143,
+    "The f1_score 3-means global corner identification": 0.39215686274509803,
+    "The f1_score 3-means each corner identification": 0.4098360655737705
+  }
+}
