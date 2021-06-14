@@ -1,0 +1,33 @@
+digraph Tree {
+node [shape=box, style="filled, rounded", color="black", fontname=helvetica] ;
+edge [fontname=helvetica] ;
+0 [label="X[3] <= 2312.5\ngini = 0.727\nsamples = 88\nvalue = [47, 44, 24, 25]\nclass = square", fillcolor="#fefbf9"] ;
+1 [label="X[105] <= 2138.5\ngini = 0.408\nsamples = 30\nvalue = [37, 13, 1, 0]\nclass = square", fillcolor="#efaf82"] ;
+0 -> 1 [labeldistance=2.5, labelangle=45, headlabel="True"] ;
+5 [label="gini = 0.0\nsamples = 20\nvalue = [34, 0, 0, 0]\nclass = square", fillcolor="#e58139"] ;
+1 -> 5 ;
+6 [label="gini = 0.381\nsamples = 10\nvalue = [3, 13, 1, 0]\nclass = hexagon", fillcolor="#7cec72"] ;
+1 -> 6 ;
+2 [label="X[75] <= 1775.0\ngini = 0.72\nsamples = 58\nvalue = [10, 31, 23, 25]\nclass = hexagon", fillcolor="#eefdec"] ;
+0 -> 2 [labeldistance=2.5, labelangle=-45, headlabel="False"] ;
+3 [label="X[27] <= 2068.0\ngini = 0.42\nsamples = 24\nvalue = [3, 6, 0, 25]\nclass = rectangle", fillcolor="#e479ed"] ;
+2 -> 3 ;
+7 [label="gini = 0.191\nsamples = 19\nvalue = [3, 0, 0, 25]\nclass = rectangle", fillcolor="#dc51e8"] ;
+3 -> 7 ;
+8 [label="gini = 0.0\nsamples = 5\nvalue = [0, 6, 0, 0]\nclass = hexagon", fillcolor="#47e539"] ;
+3 -> 8 ;
+4 [label="X[1] <= 2357.5\ngini = 0.602\nsamples = 34\nvalue = [7, 25, 23, 0]\nclass = hexagon", fillcolor="#f4fdf3"] ;
+2 -> 4 ;
+9 [label="X[76] <= 1826.5\ngini = 0.412\nsamples = 17\nvalue = [2, 20, 5, 0]\nclass = hexagon", fillcolor="#82ed78"] ;
+4 -> 9 ;
+13 [label="gini = 0.244\nsamples = 12\nvalue = [2, 19, 1, 0]\nclass = hexagon", fillcolor="#63e957"] ;
+9 -> 13 ;
+14 [label="gini = 0.32\nsamples = 5\nvalue = [0, 1, 4, 0]\nclass = cylinder", fillcolor="#6ab6ec"] ;
+9 -> 14 ;
+10 [label="X[24] <= 2049.5\ngini = 0.523\nsamples = 17\nvalue = [5, 5, 18, 0]\nclass = cylinder", fillcolor="#8fc8f0"] ;
+4 -> 10 ;
+11 [label="gini = 0.0\nsamples = 3\nvalue = [5, 0, 0, 0]\nclass = square", fillcolor="#e58139"] ;
+10 -> 11 ;
+12 [label="gini = 0.34\nsamples = 14\nvalue = [0, 5, 18, 0]\nclass = cylinder", fillcolor="#70b8ec"] ;
+10 -> 12 ;
+}
