@@ -1,6 +1,5 @@
 from xh430 import *
 import time
-import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -29,7 +28,6 @@ my_dxl_R.enable_torque()
 my_dxl_L.get_operating_mode()
 my_dxl_R.get_operating_mode()
 
-################ SIDE FUNCTIONS #################
 
 # CLOCK SET UP
 def get_time(start_time):
@@ -49,6 +47,7 @@ lin_traj = [*range(deg2pos(60), deg2pos(120), 1)]  # from 70deg to 110deg
 def motionGradient(traj, dt):
     return len(traj)/dt
 
+
 """
 def iniPosition(motor_L, motor_R, traj):
     motor_L.set_position(traj[0])
@@ -56,16 +55,12 @@ def iniPosition(motor_L, motor_R, traj):
     time.sleep(2)
 """
 
-
 def set_current_control_mode(motor):
     motor.set_operating_mode(motor.CURRENT_CONTROL_MODE)
     if motor.id == 1:
         motor.set_current(20)   # low torque
     else:
         motor.set_current(-30)  # low torque
-
-
-################ MAIN FUNCTIONS #################
 
 def singleAct(motor_object, torque_motor, traj, dt, forward, start_time):
     """change position of one actuator with a given speed """
@@ -177,7 +172,7 @@ def controlRolling(motor_L, motor_R, traj):
     #singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip)
 
     # SET UP THE SPEED OF THE MOTION (30 SEEMS TO BE GOOD) / PUT THE OBJECT
-    dt = 200  # int(input("How long do you want the motion to last :"))
+    dt = 200
     # INITIALIZE THE GRASP
     graspManip(motor_L, motor_R, traj, dt, clockwise)
 
@@ -259,6 +254,7 @@ def controlRolling(motor_L, motor_R, traj):
     time.sleep(.75)
     new_traj_L = [*range(2047, motor_L.get_position(), 1)]
     new_traj_R = [*range(2047, motor_R.get_position(), 1)]
+    dt = 70
     singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise, start_manip)
     singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip)
     return [data_pos_L, data_pos_R, dict_pos]
@@ -287,36 +283,24 @@ def plot_pos_evol(thetaL, thetaR, file):
     plt.title("square rolling "+file)
     plt.ylabel('position(deg)')
     plt.xlabel('time(s)')
-    plt.savefig(file)
-
+    #plt.savefig(file)
 
 ####### CALL THE MAIN CONTROL FUNCTION #######
 
-# INITIALIZATION
-def user_input():
-    ans = input("Continue and initialise? y/n : ")
-    if ans == "n":
-        return False
-    else:
-        return True
-
-poses_drf = ["60","65","70"]
-finger_gaps = ["34","42","50"]
-shape_list = ["rectangle", "circle", "square", "hexagon"]
-
-sqrt_hex_dim = ["20","25","30"]
+# White lists
+sqrt_hex_dim = ["20", "25", "30"]
 circle_dim = ["20","25"]
 rectangle_dim = ["20_25"]
+poses_drf = ["60", "65", "70"]
+finger_gaps = ["34", "42", "50"]
+shape_list = ["rectangle", "circle", "square", "hexagon"]
+trials = ["1", "2"]
 
-trials = ["1","2"]
+# How to store data, new file ?
+possibilities = ["new", "push", "n"]
 
-possibilities = ["ini","noini","n"]
-
-
-def manipulate(dxl_L, dxl_R, dxl_traj):
-    """ perform the manipulation and store the date given the user input"""
-    [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(dxl_L, dxl_R, dxl_traj)#(my_dxl_L, my_dxl_R, lin_traj)
-    
+# set up filename and database name
+def set_filename():
     filename = ""
 
     # The shape
@@ -367,38 +351,77 @@ def manipulate(dxl_L, dxl_R, dxl_traj):
             print("Oops!  That was no valid trial number.  Try again...")
     # generate the filename
     filename += "dim_"+dim+"_pose_"+pose+"_gap_"+gap+"_"+trial
-    ####### PLOT THE RESULTS #######
-    plot_pos_evol(data_pos_L, data_pos_R, filename)
-    plot_pos_evol(data_pos_L, data_pos_R, filename)
+    return [filename, shape]
 
+def set_databasename(filename, shape, data_pos_trial):
     # STORE THE DATA  INTO A JSON FILE
     data_pos = {
         filename: data_pos_trial
     }
 
+    # In what file do you want to store the data
+    databasename = "data_pos_trial_"+shape
+    while True:
+        ans = input("Do you want to add a number at the end of the database name (y/n) ?")
+        if ans == "y":
+            while True:
+                try:
+                    x = int(input("Please enter a number: "))
+                    databasename += "_"+str(x)
+                    break
+                except ValueError:
+                    print("Oops!  That was no valid number.  Try again...")
+            break
+        elif ans == "n":
+            break
+        else:
+            print("Invalid answer. Try again ...")
+    databasename += ".json"
+
     # trial
     while True:
-        print(("Do you want to continue and maybe initialise ?"))
+        print("Do you want to create new file, push to existing  database or do nothing ?")
         poss = input(possibilities)
-        if (poss == "ini"):
-            with open("data_pos_trial_rectangle.json", 'w') as f:
+        if poss == "new":
+            with open(databasename, 'w') as f:
                 indent = 2  # is not needed but makes the file human-readable
                 json.dump(data_pos, f, indent=2)
             break
-        elif (poss == "noini"):
-            with open("data_pos_trial_rectangle.json", 'r+') as f:
-                # indent=2 is not needed but makes the file human-readable
+        elif poss == "push":
+            with open(databasename, 'r+') as f:
+                indent = 2  # is not needed but makes the file human-readable
                 data_pos_final = json.load(f)
                 data_pos_final.update(data_pos)
                 f.seek(0)
                 json.dump(data_pos_final, f, indent=2)
             break
-        elif (poss == "n"):
+        elif poss == "n":
             break
         else:
             print("Oops!  That was not part of the possibilities.  Try again...")
 
 
+def manipulate(dxl_L, dxl_R, dxl_traj):
+    """ perform the manipulation and store the date given the user input"""
+    [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(dxl_L, dxl_R, dxl_traj)
+    print(len(data_pos_L[0]))
+
+    while True:
+        ans = input ("Do you want to store the data (y/n)?")
+        if ans == "y":
+            [filename, shape] = set_filename()
+            set_databasename(filename, shape, data_pos_trial)
+            ####### PLOT THE RESULTS #######
+            plot_pos_evol(data_pos_L, data_pos_R, filename)
+            plot_pos_evol(data_pos_L, data_pos_R, filename)
+            break
+        elif ans == "n":
+            break
+        else:
+            print("invalid answer (y/n). Try again")
+
+
+manipulate(my_dxl_L, my_dxl_R, lin_traj)
 
 ################ DECONNECTING #################
 

@@ -282,15 +282,16 @@ def plot_pos_evol(thetaL, thetaR, file):
     plt.title("square rolling "+file)
     plt.ylabel('position(deg)')
     plt.xlabel('time(s)')
-    plt.savefig(file)
+    #plt.savefig(file)
 
 
 ####### CALL THE MAIN CONTROL FUNCTION #######
 
 # MANIPULATION
 [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
-print(data_pos_trial)
+print(len(data_pos_L[0]))
 
+"""
 ####### PLOT THE RESULTS #######
 #filename = "dim_"+str(25)+"_pose_"+str(70)+"_gap_"+str(50)+"_2"
 filename = "dim_"+str(20)+"_"+str(25)+"_pose_"+str(60)+"_gap_"+str(50)+"_1" # rectangle (1st dim stick to right finger at the beginning of the manipulation
@@ -326,7 +327,7 @@ if user_input():
         data_pos_final.update(data_pos)
         f.seek(0)
         json.dump(data_pos_final, f, indent=2)
-
+"""
 
 # deconnecting
 my_dxl_L.disable_torque()
