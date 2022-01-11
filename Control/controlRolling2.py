@@ -1,5 +1,6 @@
 from xh430 import *
 import time
+import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import json
@@ -28,6 +29,7 @@ my_dxl_R.enable_torque()
 my_dxl_L.get_operating_mode()
 my_dxl_R.get_operating_mode()
 
+################ SIDE FUNCTIONS #################
 
 # CLOCK SET UP
 def get_time(start_time):
@@ -47,7 +49,6 @@ lin_traj = [*range(deg2pos(60), deg2pos(120), 1)]  # from 70deg to 110deg
 def motionGradient(traj, dt):
     return len(traj)/dt
 
-
 """
 def iniPosition(motor_L, motor_R, traj):
     motor_L.set_position(traj[0])
@@ -55,12 +56,16 @@ def iniPosition(motor_L, motor_R, traj):
     time.sleep(2)
 """
 
+
 def set_current_control_mode(motor):
     motor.set_operating_mode(motor.CURRENT_CONTROL_MODE)
     if motor.id == 1:
         motor.set_current(20)   # low torque
     else:
         motor.set_current(-30)  # low torque
+
+
+################ MAIN FUNCTIONS #################
 
 def singleAct(motor_object, torque_motor, traj, dt, forward, start_time):
     """change position of one actuator with a given speed """
@@ -172,7 +177,7 @@ def controlRolling(motor_L, motor_R, traj):
     #singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip)
 
     # SET UP THE SPEED OF THE MOTION (30 SEEMS TO BE GOOD) / PUT THE OBJECT
-    dt = 70  # int(input("How long do you want the motion to last :"))
+    dt = 200  # int(input("How long do you want the motion to last :"))
     # INITIALIZE THE GRASP
     graspManip(motor_L, motor_R, traj, dt, clockwise)
 
@@ -287,48 +292,116 @@ def plot_pos_evol(thetaL, thetaR, file):
 
 ####### CALL THE MAIN CONTROL FUNCTION #######
 
-# MANIPULATION
-[data_pos_L, data_pos_R, data_pos_trial] = controlRolling(my_dxl_L, my_dxl_R, lin_traj)
-print(data_pos_trial)
-
-####### PLOT THE RESULTS #######
-#filename = "dim_"+str(25)+"_pose_"+str(70)+"_gap_"+str(50)+"_2"
-filename = "dim_"+str(20)+"_"+str(25)+"_pose_"+str(60)+"_gap_"+str(50)+"_1" # rectangle (1st dim stick to right finger at the beginning of the manipulation
-plot_pos_evol(data_pos_L, data_pos_R, filename)
-plot_pos_evol(data_pos_L, data_pos_R, filename)
-
-# STORE THE DATA  INTO A JSON FILE
-data_pos = {
-    filename: data_pos_trial
-}
-
-
 # INITIALIZATION
 def user_input():
-    ans = input("Continue ? y/n : ")
+    ans = input("Continue and initialise? y/n : ")
     if ans == "n":
         return False
     else:
         return True
 
+poses_drf = ["60","65","70"]
+finger_gaps = ["34","42","50"]
+shape_list = ["rectangle", "circle", "square", "hexagon"]
 
-#if user_input():
- #   with open("data_pos_trial_rectangle.json", 'w') as f:
- #       indent = 2  # is not needed but makes the file human-readable
-  #      json.dump(data_pos, f, indent=2)
+sqrt_hex_dim = ["20","25","30"]
+circle_dim = ["20","25"]
+rectangle_dim = ["20_25"]
 
-# ONCE INITIALIZED
+trials = ["1","2"]
 
-if user_input():
-    with open("data_pos_trial_rectangle.json", 'r+') as f:
-        # indent=2 is not needed but makes the file human-readable
-        data_pos_final = json.load(f)
-        data_pos_final.update(data_pos)
-        f.seek(0)
-        json.dump(data_pos_final, f, indent=2)
+possibilities = ["ini","noini","n"]
 
 
-# deconnecting
+def manipulate(dxl_L, dxl_R, dxl_traj):
+    """ perform the manipulation and store the date given the user input"""
+    [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(dxl_L, dxl_R, dxl_traj)#(my_dxl_L, my_dxl_R, lin_traj)
+    
+    filename = ""
+
+    # The shape
+    while True:
+        print("The shape ?")
+        shape = input(shape_list)
+        if (shape in  shape_list):
+            break
+        else:
+            print("Oops!  That was no valid shape name.  Try again...")
+    # dimension
+    if (shape == "rectangle"):
+        dim_list = rectangle_dim
+    elif (shape == "circle"):
+        dim_list = circle_dim
+    else:
+        dim_list = sqrt_hex_dim
+    while True:
+        print(("The dimension ?"))
+        dim = input (dim_list)
+        if (dim in dim_list):
+            break
+        else:
+            print("Oops!  That was no valid dimension.  Try again...")
+    # pose
+    while True:
+        print(("The pose ?"))
+        pose = input (poses_drf)
+        if (pose in poses_drf):
+            break
+        else:
+            print("Oops!  That was no valid pose.  Try again...")
+    # gap
+    while True:
+        print(("The fingers gap ?"))
+        gap = input (finger_gaps)
+        if (gap in finger_gaps):
+            break
+        else:
+            print("Oops!  That was no valid fingers gap.  Try again...")
+    # trial
+    while True:
+        print(("The trial ?"))
+        trial = input(trials)
+        if (trial in trials):
+            break
+        else:
+            print("Oops!  That was no valid trial number.  Try again...")
+    # generate the filename
+    filename += "dim_"+dim+"_pose_"+pose+"_gap_"+gap+"_"+trial
+    ####### PLOT THE RESULTS #######
+    plot_pos_evol(data_pos_L, data_pos_R, filename)
+    plot_pos_evol(data_pos_L, data_pos_R, filename)
+
+    # STORE THE DATA  INTO A JSON FILE
+    data_pos = {
+        filename: data_pos_trial
+    }
+
+    # trial
+    while True:
+        print(("Do you want to continue and maybe initialise ?"))
+        poss = input(possibilities)
+        if (poss == "ini"):
+            with open("data_pos_trial_rectangle.json", 'w') as f:
+                indent = 2  # is not needed but makes the file human-readable
+                json.dump(data_pos, f, indent=2)
+            break
+        elif (poss == "noini"):
+            with open("data_pos_trial_rectangle.json", 'r+') as f:
+                # indent=2 is not needed but makes the file human-readable
+                data_pos_final = json.load(f)
+                data_pos_final.update(data_pos)
+                f.seek(0)
+                json.dump(data_pos_final, f, indent=2)
+            break
+        elif (poss == "n"):
+            break
+        else:
+            print("Oops!  That was not part of the possibilities.  Try again...")
+
+
+
+################ DECONNECTING #################
+
 my_dxl_L.disable_torque()
 my_dxl_R.disable_torque()
 XH430.close_port()

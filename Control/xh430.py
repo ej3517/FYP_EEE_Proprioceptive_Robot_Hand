@@ -25,7 +25,7 @@ class XH430:
 
     DXL_MINIMUM_POSITION_VALUE = 1324 #1535  # Dynamixel will rotate between this value
     DXL_MAXIMUM_POSITION_VALUE = 2771 #2560  # and this value (note that the Dynamixel would not move when the position value is out of movable range. Check e-manual about the range of the Dynamixel you use.)
-    DXL_MOVING_STATUS_THRESHOLD = 20  # Dynamixel moving status threshold
+    DXL_MOVING_STATUS_THRESHOLD = 10  # Dynamixel moving status threshold # the initial value was 20
 
     # Different operating mode
     CURRENT_CONTROL_MODE = 0
