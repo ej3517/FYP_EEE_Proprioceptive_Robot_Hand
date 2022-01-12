@@ -95,12 +95,12 @@ class XH430:
     def enable_torque(self):
         """enable torque for motor"""
         self.set_register1(ADDR_PRO_TORQUE_ENABLE, TORQUE_ENABLE)
-        print("the torque has been enabled : ", self.get_register1(ADDR_PRO_TORQUE_ENABLE))
+        print("[ID:%03d] the torque has been enabled : " % self.id, self.get_register1(ADDR_PRO_TORQUE_ENABLE))
 
     def disable_torque(self):
         """disable torque for motor"""
         self.set_register1(ADDR_PRO_TORQUE_ENABLE, TORQUE_DISABLE)
-        print("the torque has been disabled : ", self.get_register1(ADDR_PRO_TORQUE_ENABLE))
+        print("[ID:%03d] the torque has been disabled : " % self.id, self.get_register1(ADDR_PRO_TORQUE_ENABLE))
 
     def set_operating_mode(self, operating_mode):
         self.disable_torque()

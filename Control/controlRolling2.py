@@ -3,7 +3,11 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import json
+import sys
+import os
 
+
+testfile =  open("test_file.txt", "a")
 
 ################ MOTORS #################
 
@@ -28,6 +32,14 @@ my_dxl_R.enable_torque()
 my_dxl_L.get_operating_mode()
 my_dxl_R.get_operating_mode()
 
+# when you need to stop the motors
+
+
+def stop_motors():
+    my_dxl_L.disable_torque()
+    my_dxl_R.disable_torque()
+    XH430.close_port()
+
 
 # CLOCK SET UP
 def get_time(start_time):
@@ -41,51 +53,68 @@ def deg2pos(angle):
 
 
 # Linear Trajectory to follow
-lin_traj = [*range(deg2pos(60), deg2pos(120), 1)]  # from 70deg to 110deg
-
+lin_traj = [deg2pos(60), deg2pos(120)]  # from 70deg to 110deg
 
 def motionGradient(traj, dt):
-    return len(traj)/dt
-
-
-"""
-def iniPosition(motor_L, motor_R, traj):
-    motor_L.set_position(traj[0])
-    motor_R.set_position(traj[-1])
-    time.sleep(2)
-"""
+    return abs(traj[0]-traj[-1])/dt
 
 def set_current_control_mode(motor):
     motor.set_operating_mode(motor.CURRENT_CONTROL_MODE)
     if motor.id == 1:
-        motor.set_current(20)   # low torque
+        motor.set_current(40)   # low torque
     else:
-        motor.set_current(-30)  # low torque
+        motor.set_current(-60)  # low torque
+
+def reboot():
+    my_dxl_L.set_operating_mode(my_dxl_L.POSITION_CONTROL_MODE)
+    my_dxl_R.set_operating_mode(my_dxl_R.POSITION_CONTROL_MODE)
+    ang = deg2pos(90.0)
+    my_dxl_L.set_position(ang)
+    my_dxl_R.set_position(ang)
+
+# Condition to continue program
+def user_input():
+    while True:
+        ans = input("Continue ? y/n/reboot : ")
+        if ans == "n":
+            reboot()
+            stop_motors()
+            sys.exit("EXIT PROGRAM")
+        elif ans == "y":
+            break
+        elif ans == "reboot":
+            reboot()
+        else:
+            print("This is an invalid answer. Try again ... (y/n) ?")
+
 
 def singleAct(motor_object, torque_motor, traj, dt, forward, start_time):
     """change position of one actuator with a given speed """
     # INITIALIZATION
-    pict_nb = 1
     data_pos = [[], []]
     data_pos_torque = [[], []]
     # MOTORS
-    motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
+    if motor_object.get_operating_mode() == motor_object.CURRENT_CONTROL_MODE:
+        motor_object.set_operating_mode(motor_object.POSITION_CONTROL_MODE)
     if forward:
         forward_coeff = 1
+        first_index = 0
         last_index = -1
     else:
         forward_coeff = -1
+        first_index = -1
         last_index = 0
-    start_pos = motor_object.get_position()
+    start_pos = traj[first_index]
     data_pos[0] += [start_pos]
     data_pos[1] += [get_time(start_time)]
     data_pos_torque[0] += [torque_motor.get_position()]
     data_pos_torque[1] += [get_time(start_time)]
 
-    gradient = int(motionGradient(traj, dt))   # gradient of the motion
-    step = 1
+    gradient = motionGradient(traj, dt)   # gradient of the motion
+    step = 0
     while abs(step) <= dt:
-        input_pos = gradient*step*forward_coeff + start_pos
+        input_pos = int(gradient*step*forward_coeff + start_pos)
+        testfile.write(str(input_pos)+"\n")
         input_pos = motor_object.set_position(input_pos)
         while 1:
             present_pos = motor_object.get_position()
@@ -96,13 +125,11 @@ def singleAct(motor_object, torque_motor, traj, dt, forward, start_time):
             if not abs(input_pos - present_pos) > motor_object.DXL_MOVING_STATUS_THRESHOLD:
                 step += 1
                 break
-
     motor_object.set_position(traj[last_index])
     time.sleep(.75)  # time for the actuator to reach the final position
-    #data_pos[0] += [motor_object.get_position()]
-    #data_pos[1] += [get_time(start_time)]
-    #data_pos_torque[0] += [torque_motor.get_position()]
-    #data_pos_torque[1] += [get_time(start_time)]
+    print(len(data_pos[0]))
+    # do you want to stop the manipulation
+    user_input()
     return [data_pos, data_pos_torque]
 
 
@@ -153,6 +180,7 @@ def graspManip(motor_L, motor_R, traj, dt, forward):
         motor_R.set_position(new_present_pos_R)
         time.sleep(.75) # time for the actuator to reach the final position
     time.sleep(.5)
+    user_input()
 
 
 ######### CONTROL FULL MANIPULATION #########
@@ -166,17 +194,15 @@ def controlRolling(motor_L, motor_R, traj):
 
     clockwise = True
     anticlockwise = False
-    #### THAT'S WHAT WE NEED TO CHANGE
-    #iniPosition(motor_L, motor_R, traj)
-    #singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise, start_manip)
-    #singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip)
 
-    # SET UP THE SPEED OF THE MOTION (30 SEEMS TO BE GOOD) / PUT THE OBJECT
-    dt = 200
     # INITIALIZE THE GRASP
+    user_input()
+    dt = 50
     graspManip(motor_L, motor_R, traj, dt, clockwise)
 
     ######## INITIAL MANIPUALTION --> CLOCKWISE MOTION #######
+    # SET UP THE SPEED
+    dt = 200
     # LF TORQUE MODE
     pos_L = motor_L.get_position()
     set_current_control_mode(motor_L)
@@ -189,7 +215,7 @@ def controlRolling(motor_L, motor_R, traj):
 
     # RF TRAJECTORY
     pos_R = motor_R.get_position()
-    new_traj = [*range(pos_R, traj[-1], 1)]
+    new_traj = [pos_R, traj[-1]]
 
     # RF POSITION MODE AND START CLOCKWISE MOTION
     list_pos_RL = singleAct(motor_R, motor_L, new_traj, dt, clockwise, start_manip)
@@ -201,6 +227,8 @@ def controlRolling(motor_L, motor_R, traj):
     data_pos_L[1] += list_pos_RL[1][1]
 
     ######## FIRST MANIPUALTION --> ANTICLOCKWISE MOTION ########
+    # SET UP THE SPEED
+    dt = 200
     # LF POSITION CONTROL MODE
     motor_L.set_operating_mode(motor_L.POSITION_CONTROL_MODE)
     # RF CURRENT CONTROL MODE
@@ -209,7 +237,7 @@ def controlRolling(motor_L, motor_R, traj):
 
     # LF NEW TRAJECTORY
     pos_L = motor_L.get_position()
-    new_traj = [*range(traj[0], pos_L, 1)]
+    new_traj = [traj[0], pos_L]
     time.sleep(.75)
 
     # LF ANTICLOCKWISE MOTION
@@ -233,7 +261,7 @@ def controlRolling(motor_L, motor_R, traj):
 
     # RF NEW TRAJECTORY
     pos_R = motor_R.get_position()
-    new_traj = [*range(pos_R, traj[-1], 1)]
+    new_traj = [pos_R, traj[-1]]
     time.sleep(.75)
 
     # RF CLOCKWISE MOTION
@@ -250,11 +278,13 @@ def controlRolling(motor_L, motor_R, traj):
     # LF POSITION CONTROL MODE
     motor_L.set_operating_mode(motor_L.POSITION_CONTROL_MODE)
 
-    # GO BACK TO INITIAL POSITION
+    ############ GO BACK TO INITIAL POSITION #############
+    # SET UP THE SPEED
+    dt = 200
+    #
     time.sleep(.75)
-    new_traj_L = [*range(2047, motor_L.get_position(), 1)]
-    new_traj_R = [*range(2047, motor_R.get_position(), 1)]
-    dt = 70
+    new_traj_L = [2047, motor_L.get_position()]
+    new_traj_R = [2047, motor_R.get_position()]
     singleAct(motor_L, motor_R, new_traj_L, dt, anticlockwise, start_manip)
     singleAct(motor_R, motor_L, new_traj_R, dt, anticlockwise, start_manip)
     return [data_pos_L, data_pos_R, dict_pos]
@@ -302,7 +332,6 @@ possibilities = ["new", "push", "n"]
 # set up filename and database name
 def set_filename():
     filename = ""
-
     # The shape
     while True:
         print("The shape ?")
@@ -328,7 +357,7 @@ def set_filename():
     # pose
     while True:
         print(("The pose ?"))
-        pose = input (poses_drf)
+        pose = input(poses_drf)
         if (pose in poses_drf):
             break
         else:
@@ -401,9 +430,10 @@ def set_databasename(filename, shape, data_pos_trial):
             print("Oops!  That was not part of the possibilities.  Try again...")
 
 
-def manipulate(dxl_L, dxl_R, dxl_traj):
+def manipulate(dxl_traj):
     """ perform the manipulation and store the date given the user input"""
-    [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(dxl_L, dxl_R, dxl_traj)
+    [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(my_dxl_L, my_dxl_R, dxl_traj)
+
     print(len(data_pos_L[0]))
 
     while True:
@@ -421,10 +451,12 @@ def manipulate(dxl_L, dxl_R, dxl_traj):
             print("invalid answer (y/n). Try again")
 
 
-manipulate(my_dxl_L, my_dxl_R, lin_traj)
+# execute the function
+manipulate(lin_traj)
 
 ################ DECONNECTING #################
 
-my_dxl_L.disable_torque()
-my_dxl_R.disable_torque()
-XH430.close_port()
+stop_motors()
+
+testfile.close()
+
