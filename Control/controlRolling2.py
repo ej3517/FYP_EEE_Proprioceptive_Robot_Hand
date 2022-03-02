@@ -313,7 +313,7 @@ def plot_pos_evol(thetaL, thetaR, file):
     plt.title("square rolling "+file)
     plt.ylabel('position(deg)')
     plt.xlabel('time(s)')
-    #plt.savefig(file)
+    plt.savefig(file)
 
 ####### CALL THE MAIN CONTROL FUNCTION #######
 
@@ -434,16 +434,18 @@ def manipulate(dxl_traj):
     """ perform the manipulation and store the date given the user input"""
     [data_pos_L, data_pos_R, data_pos_trial] = controlRolling(my_dxl_L, my_dxl_R, dxl_traj)
 
-    print(len(data_pos_L[0]))
-
     while True:
-        ans = input ("Do you want to store the data (y/n)?")
+        ans = input ("Do you want to store the data (y/n) or just plot 'plot'?")
         if ans == "y":
             [filename, shape] = set_filename()
             set_databasename(filename, shape, data_pos_trial)
             ####### PLOT THE RESULTS #######
             plot_pos_evol(data_pos_L, data_pos_R, filename)
             plot_pos_evol(data_pos_L, data_pos_R, filename)
+            break
+        elif ans == "plot":
+            plot_pos_evol(data_pos_L, data_pos_R, "just_plot")
+            plot_pos_evol(data_pos_L, data_pos_R, "just_plot")
             break
         elif ans == "n":
             break
